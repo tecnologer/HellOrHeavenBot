@@ -3,13 +3,21 @@
 Bot para telegram que registra las acciones buenas y malas de los usuarios.
 
 ## Comandos
-- `/hell <username>`: para agregar una accion mala al usuario
-- `/heaven <username>`: agrega una accion buena al usuario
-- `/stats`: solo arroja la informacion del usuario que lo ejecute
+- `/help` => Muestra la informacion de los comandos
+- `/heaven <username>` => Se agrega al usuario un boleto al cielo
+- `/hell <username>` => Se agrega al usuario un boleto al infierno
+- `/cancel` => Cancela la peticion actual
+- `/stats` => Muestra tus estadisticas
+- `/all` => Modo Dios: Muestra todas las estadisticas
 
 ## Dependencias
 - [TinyDb][2]: `pip install tinydb`
 - [telepot][3]: `pip install telepot`
+
+## ToDo
+- Imprimir alias para los comandos
+- Documentar como usar stickers para comandos
+
 
 Pruebalo: [t.me/hellorheavenbot][1]
 
