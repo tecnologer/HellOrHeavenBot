@@ -1,4 +1,5 @@
 .vscode/
 *.json
 test/
-key.py*
+key.py
+key.pyc
