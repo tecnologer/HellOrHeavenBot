@@ -3,12 +3,13 @@ import sys
 import time
 import random
 import os
+import key
 from pprint import pprint
 import dao
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-bot = telepot.Bot('684372282:AAEHSrUFkvdOoCci8c0FzZ0H39BGfJ5Zbxc')  # token
+bot = telepot.Bot(key.BOT_KEY)  # token
 
 timeout = {}
 ticketToHell={}
