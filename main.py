@@ -4,6 +4,7 @@ import time
 import random
 import os
 import key
+import com
 from pprint import pprint
 import dao
 
@@ -12,13 +13,13 @@ sys.setdefaultencoding('utf-8')
 bot = telepot.Bot(key.BOT_KEY)  # token
 
 timeout = {}
-ticketToHell={}
 
 tranquiloviejo = u"CAADAQADNwADzxSlAAEpVbCJbOTMsAI"
 awanta = u'CAADAQADqwADJaHuBMhw3ty2zbpjAg'
 dejesedemamadas = u'CAADAQAD7wEAAs8UpQABdurS64LRGooC'
 alapifu = u"CAADAQADkQADJaHuBAABSnzPxbzjJQI"
-ticket = u'CAADAQADnQADJaHuBGvY1E43XYjJAg'
+ticketHell = u'CAADAQADnQADJaHuBGvY1E43XYjJAg'
+ticketHeaven = u'CAADAQADswADJaHuBEcjnhhUIqsPAg'
 terco = u'CAADAQADqgADJaHuBEK37px2YeW-Ag'
 
 def handle(msg):
@@ -52,17 +53,15 @@ def getAwnser(type):
 def newRecord(sender):
     timeout[sender] = {"time": time.time(), "count": 0}
 
-
-def waitToHell(msg):
+def wait(msg, type):
     sender = getUserSender(msg)
     chat_id = msg['chat']['id']
     user_id = msg["from"]['id']
-    
-    reply(msg, "a quien le damos ese?")    
+
+    reply(msg, "a quien le damos ese?")
     newRecord(sender)
 
-    ticketToHell[chat_id]=user_id
-
+    com.Wait(chat_id, user_id, type)
 
 def validTimeout(msg, sender):
     if not sender in timeout:
@@ -81,9 +80,12 @@ def validTimeout(msg, sender):
             replySticker(msg, dejesedemamadas)
         elif timeout[sender]["count"] == 20:
             replySticker(msg, alapifu)
+        elif timeout[sender]["count"] == 25:
             replySticker(msg, dejesedemamadas)
         elif timeout[sender]["count"] == 30:
             replySticker(msg, terco)
+        else:
+            reply(msg, "esperate {} segundos".format(30-elapsed))
 
         return False
 
@@ -102,14 +104,19 @@ def on_chat_message(msg):
     chat_id = msg['chat']['id']
     user_id = msg["from"]['id']
 
-    if chat_id in ticketToHell and ticketToHell[chat_id] != user_id:
+    """  if chat_id in ticketWait and ticketWait[chat_id] != user_id:
         reply(msg, "a ti no te pregunte, metiche!")
-        return
-    elif chat_id in ticketToHell and ticketToHell[chat_id] == user_id and 'text' in msg:
-        ignoreTimeout = True
-        cmd = "/hell"
+        return """
+    if com.IsWaiting(chat_id, user_id) and 'text' in msg:
         user = msg['text'].split(' ')[0].replace('@', '')
-        del ticketToHell[chat_id]
+
+        if user.lower() == "/cancel":
+            com.cancel("", "", chat_id)
+            reply(msg, 'ahi ta pues, che rajon!')
+            return 
+        ignoreTimeout = True
+        cmd = com.GetWaitingCmd(chat_id, user_id)
+        com.cancel("", "", chat_id)
     elif 'text' in msg:
         cmds = msg['text'].split(' ')
         response = ''
@@ -118,14 +125,32 @@ def on_chat_message(msg):
             user = cmds[1].replace('@', '')        
         elif len(cmds) == 1:
             cmd = cmds[0]
-    elif 'sticker' in msg and msg['sticker']['file_id']==ticket:
+    elif 'sticker' in msg and msg['sticker']['file_id']==ticketHell:
         if not validTimeout(msg, userSender):
             return        
-        waitToHell(msg)
+        wait(msg, dao.HELL)
+        return
+    elif 'sticker' in msg and msg['sticker']['file_id'] == ticketHeaven:
+        if not validTimeout(msg, userSender):
+            return
+        wait(msg, dao.HEAVEN)
+        return
+    elif 'sticker' in msg:
         return
 
     if not cmd.startswith('/') and not 'sticker' in msg:
         return
+
+    # acept commands type /command@HellOrHeavenBot
+    cmd = cmd.replace('@HellOrHeavenBot', '')
+
+    if not cmd in com.COMMANDS:
+        cmd = com.VerifyAlias(cmd)
+        if cmd == "":
+            return
+
+    # flag to validate or not the timeout
+    ignoreTimeout = not com.COMMANDS[cmd][com.WAIT]
 
     if not ignoreTimeout and not validTimeout(msg, userSender):
         return
@@ -137,67 +162,12 @@ def on_chat_message(msg):
     if user.upper() == userSender.upper():
         reply(msg, u'solo dios puede juzgarte... nah!, los demas lo haran \U0001f602')
         return
-    cmd = cmd.replace('@HellOrHeavenBot','')
     
-    if cmd == '':
-        return
-    elif cmd == "/hell":
-        if user == '':
-            reply(msg, 'que raro que tu... lee el manual!')
-            return 
+   
+    response, needWait = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
 
-        dao.Update(user,dao.HELL)
-        response = getAwnser(dao.HELL)
+    if needWait:
         newRecord(userSender)
-    elif cmd == "/heaven":
-        if user == '':
-            reply(msg, 'que raro que tu... lee el manual!')
-            return
-
-        dao.Update(user, dao.HEAVEN)
-        response = getAwnser(dao.HEAVEN)
-        
-        newRecord(userSender)
-    elif cmd == "/stats":
-        stats = dao.GetStats(userSender)
-
-        if stats != []:
-            hell = stats[0]['hell']
-            heaven = stats[0]['heaven']
-            emoji = u'\U0001f608'
-            
-            if heaven > hell:
-                emoji = u'\u271d\ufe0f'
-
-            response = 'Heaven: {}, Hell: {} ... {}'.format(heaven, hell, emoji)
-        else:
-            response = '{} la estadisticas no importan, vas al infierno de cualquier manera.'.format(userSender)
-    elif cmd == "/man" or cmd == '/help' or cmd == '/?':
-        response = '- /hell <username>: el usuario gana un boleto directo al infierno muajaja\n- /heaven <username>: le dices que esa persona ha obrado bien\n- /stats : ves tus estadisticas'
-    elif cmd == '/all':
-        user = msg['from']['username']
-        if user != 'Tecnologer':
-            reply(msg, "solo dios tiene ese poder")
-            return
-        
-        stats = dao.GetAllStats()
-
-        if len(stats) == 0:
-            return
-
-        for val in stats:
-            heaven = val['heaven']
-            hell = val["hell"]
-            
-            emoji = u'\U0001f608'
-
-            if heaven > hell:
-                emoji = u'\u271d\ufe0f'
-
-            response += '- {} -> Heaven: {}, Hell: {} ... {}\n'.format(val["user"],  heaven, hell, emoji)
-    else:
-        return
-        # response = 'por no saber leer manuales te iras al infierno'
         
     reply(msg, response)
 
