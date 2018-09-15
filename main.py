@@ -150,7 +150,8 @@ def on_chat_message(msg):
             return
 
     # flag to validate or not the timeout
-    ignoreTimeout = not com.COMMANDS[cmd][com.WAIT]
+    if not ignoreTimeout:
+        ignoreTimeout = not com.COMMANDS[cmd][com.WAIT]
 
     if not ignoreTimeout and not validTimeout(msg, userSender):
         return
