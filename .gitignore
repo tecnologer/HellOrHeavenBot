@@ -2,6 +2,4 @@
 *.json
 test/
 key.py
-/key.pyc
 /key.py*
-/key.py
