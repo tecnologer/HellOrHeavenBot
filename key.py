@@ -1,3 +1,3 @@
 
 # telegram bot key
-BOT_KEY=""
+BOT_KEY = ""
