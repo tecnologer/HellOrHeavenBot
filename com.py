@@ -73,7 +73,7 @@ def cancel(user, userSender, chat_id):
 
 
 def showHelp(user, userSender, chat_id):
-    res = ""
+    res = "Bot para telegram que registra las acciones buenas y malas de los usuarios.\n\n"
     for k, v in COMMANDS.iteritems():
         res += "- {} {}{}=> {}\n".format(k, v[PARAMS], "" if v[PARAMS]=="" else " ", v[DESC])
     
