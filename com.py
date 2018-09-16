@@ -118,7 +118,8 @@ COMMANDS = {
     "/all": {
         FUNC: getAllStats,
         DESC: "Modo Dios: Muestra todas las estadisticas",
-        PARAMS: ""
+        PARAMS: "",
+        WAIT: True
     },
     "/cancel": {
         FUNC: cancel,
