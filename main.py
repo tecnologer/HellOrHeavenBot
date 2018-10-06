@@ -5,6 +5,7 @@ import random
 import os
 import key
 import com
+import re
 from pprint import pprint
 import dao
 
@@ -22,6 +23,25 @@ ticketHell = u'CAADAQADnQADJaHuBGvY1E43XYjJAg'
 ticketHeaven = u'CAADAQADswADJaHuBEcjnhhUIqsPAg'
 terco = u'CAADAQADqgADJaHuBEK37px2YeW-Ag'
 
+amivalevrg = u'CAADAQADiAADJaHuBD7kz0JCJne4Ag'
+atodosvalevrg = u'CAADAQADigADJaHuBEbW2qfTwX5XAg'
+uypuesperdon = u''
+
+kheberga = u'CAADAQADiwADJaHuBCxFUkncLVKjAg'
+
+iscoraline = re.compile('(?im).*c(a|o)r(a|o)line.*')
+isgay = re.compile('(?im).*(gay|maricon).*')
+isgod = re.compile('(?im).*(dios|god).*')
+isnigga = re.compile('(?im).*(negro|niga|nigga|nigger).*')
+trabajaperro = re.compile('(?im)trabaja, perro.*')
+
+mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
+hagaaay_gif = u'CgADAwADAQADhjxQTo1Kz-gOAQ_jAg'
+ikillu_gif = u'CgADBAADFaAAAloXZAe9o2B4i9CciwI'
+racists_gif = u'CgADBAADwKMAAlEXZAcPm6zqHWX1DAI'
+trabajaperro_gif = u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
+
+
 def handle(msg):
     pprint(msg)
 
@@ -38,7 +58,13 @@ def isBot(msg):
 def reply(msg, response):
     chat_id = msg['chat']['id']
     msgId = msg['message_id']
-    bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msgId)
+    bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msgId )
+
+
+def replyDocument(msg, docid):
+    chat_id = msg['chat']['id']
+    msgId = msg['message_id']
+    bot.sendDocument(chat_id=chat_id, document=docid, reply_to_message_id=msgId)
 
 
 def replySticker(msg, sticker):
@@ -91,6 +117,22 @@ def validTimeout(msg, sender):
 
     return True
 
+
+def checkSpecialWords(msg):    
+    if iscoraline.match(msg['text']):
+        reply(msg, "si seras, si seras, que se llama Karelia, che terco!")
+    elif isgay.match(msg['text']):
+        replyDocument(msg, hagaaay_gif)
+    elif isgod.match(msg['text']):
+        replyDocument(msg, ikillu_gif)
+    elif isnigga.match(msg['text']):
+        replyDocument(msg, racists_gif)
+    elif trabajaperro.match(msg['text']):
+        replyDocument(msg, trabajaperro_gif)
+        
+        
+    
+
 def on_chat_message(msg):
     # if not has text or sticker
     if isBot(msg) or (not 'text' in msg and not 'sticker' in msg):
@@ -110,9 +152,9 @@ def on_chat_message(msg):
     if com.IsWaiting(chat_id, user_id) and 'text' in msg:
         user = msg['text'].split(' ')[0].replace('@', '')
 
-        if user.lower() == "/cancel":
+        if user.startswith("/cancel"):
             com.cancel("", "", chat_id)
-            reply(msg, 'ahi ta pues, che rajon!')
+            replySticker(msg, kheberga)
             return 
         ignoreTimeout = True
         cmd = com.GetWaitingCmd(chat_id, user_id)
@@ -135,10 +177,14 @@ def on_chat_message(msg):
             return
         wait(msg, dao.HEAVEN)
         return
+    elif 'sticker' in msg and msg['sticker']['file_id'] == amivalevrg:
+        replySticker(msg, atodosvalevrg)
+        return
     elif 'sticker' in msg:
         return
 
     if not cmd.startswith('/') and not 'sticker' in msg:
+        checkSpecialWords(msg)
         return
 
     # acept commands type /command@HellOrHeavenBot
@@ -166,6 +212,10 @@ def on_chat_message(msg):
     
    
     response, needWait = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
+    
+    if response == "reset":
+        replyDocument(msg, mcdinero_gif)
+        return
 
     if needWait:
         newRecord(userSender)
