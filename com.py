@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import dao
 
 DESC = "desc"
@@ -79,6 +82,10 @@ def showHelp(user, userSender, chat_id):
     
     return res, COMMANDS["/help"][WAIT]
 
+
+def resetData(user, userSender, chat_id):
+    return u"reset", COMMANDS["/reset"][WAIT]
+
 def VerifyAlias(cmd):
     if cmd in alias:
         return alias[cmd]
@@ -95,6 +102,17 @@ def GetWaitingCmd(chat_id, user_id):
 def Wait(chat_id, user_id, type):
     ticketWait[chat_id] = {user_id: type}
 
+
+def showAlias(comando, userSender, chat_id):
+    if comando == "":
+        return u'que raro que tu... lee el manual! (¬_¬)', COMMANDS["/alias"][WAIT]
+
+    res = "Alias para el comando {}\n\n".format(comando)
+    for k, v in alias.iteritems():
+        if v == comando:
+            res += "- {}\n".format(k)
+
+    return res, COMMANDS["/alias"][WAIT]
 
 COMMANDS = {
     "/hell":{
@@ -132,15 +150,29 @@ COMMANDS = {
         DESC: "Muestra la informacion de los comandos",
         PARAMS: "",
         WAIT: False
+    },
+    "/reset": {
+        FUNC: resetData,
+        DESC: "Restablece tus estadisticas",
+        PARAMS: "",
+        WAIT: False
+    },
+    "/alias":{
+        FUNC: showAlias,
+        DESC: "Muestra el alias para el comando elegido",
+        PARAMS: "</comando>",
+        WAIT: False
     }
 }
 
 alias = {
-    "/infierno": "/hell",
-    "/cielo": "/heaven",
-    "/puntos": "/stats",
-    "/s": "/stats",
-    "/man": "/help",
-    "/ayuda": "/help",
-    "/?": "/help"
+    u"/infierno": u"/hell",
+    u"/cielo":    u"/heaven",
+    u"/puntos":   u"/stats",
+    u"/s":        u"/stats",
+    u"/man":      u"/help",
+    u"/ayuda":    u"/help",
+    u"/?":        u"/help",
+    u"/no":       u"/cancel",
+    u"/cancela":  u"/cancel"
 }
