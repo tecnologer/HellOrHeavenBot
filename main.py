@@ -23,17 +23,20 @@ ticketHell = u'CAADAQADnQADJaHuBGvY1E43XYjJAg'
 ticketHeaven = u'CAADAQADswADJaHuBEcjnhhUIqsPAg'
 terco = u'CAADAQADqgADJaHuBEK37px2YeW-Ag'
 
+amivalevrgtmb = u'CAADAQADtAADJaHuBJdeO7iayOyQAg'
 amivalevrg = u'CAADAQADiAADJaHuBD7kz0JCJne4Ag'
 atodosvalevrg = u'CAADAQADigADJaHuBEbW2qfTwX5XAg'
-uypuesperdon = u''
+uypuesperdon = u'CAADAQADogADJaHuBLFm_SWQWCPDAg'
+foca_gaaay = u'CAADBAADcAQAApv7sgABifFfdnNmjjsC'
+
 
 kheberga = u'CAADAQADiwADJaHuBCxFUkncLVKjAg'
 
-iscoraline = re.compile('(?im).*c(a|o)r(a|o)line.*')
-isgay = re.compile('(?im).*(gay|maricon).*')
-isgod = re.compile('(?im).*(dios|god).*')
-isnigga = re.compile('(?im).*(negro|niga|nigga|nigger).*')
-trabajaperro = re.compile('(?im)trabaja, perro.*')
+iscoraline = r"\s?c(a|o)r(a|o)line\s?"
+isgay = r"\s?(gay|maricon|p?inche puto)\s?"
+isgod = r"\b((\s+dios|god)\b|\b(dios|god)\b)\s?"
+isnigga = r"\s(negro|niga|nigga|nigger)\s?.*"
+trabajaperro = r"\s?trabaja,? perro.*"
 
 mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
 hagaaay_gif = u'CgADAwADAQADhjxQTo1Kz-gOAQ_jAg'
@@ -66,6 +69,10 @@ def replyDocument(msg, docid):
     msgId = msg['message_id']
     bot.sendDocument(chat_id=chat_id, document=docid, reply_to_message_id=msgId)
 
+
+def responseDocument(msg, docid):
+    chat_id = msg['chat']['id']
+    bot.sendDocument(chat_id=chat_id, document=docid)
 
 def replySticker(msg, sticker):
     chat_id = msg['chat']['id']
@@ -119,19 +126,16 @@ def validTimeout(msg, sender):
 
 
 def checkSpecialWords(msg):    
-    if iscoraline.match(msg['text']):
+    if re.search(iscoraline, msg['text'], re.I | re.M) is not None:
         reply(msg, "si seras, si seras, que se llama Karelia, che terco!")
-    elif isgay.match(msg['text']):
-        replyDocument(msg, hagaaay_gif)
-    elif isgod.match(msg['text']):
-        replyDocument(msg, ikillu_gif)
-    elif isnigga.match(msg['text']):
-        replyDocument(msg, racists_gif)
-    elif trabajaperro.match(msg['text']):
-        replyDocument(msg, trabajaperro_gif)
-        
-        
-    
+    elif re.search(isgay, msg['text'], re.I | re.M) is not None:
+        responseDocument(msg, hagaaay_gif)
+    elif re.search(isgod, msg['text'], re.I | re.M) is not None:
+        responseDocument(msg, ikillu_gif)
+    elif re.search(isnigga, msg['text'], re.I | re.M) is not None:
+        responseDocument(msg, racists_gif)
+    elif re.search(trabajaperro, msg['text'], re.I | re.M) is not None:
+        responseDocument(msg, trabajaperro_gif)
 
 def on_chat_message(msg):
     # if not has text or sticker
@@ -178,9 +182,10 @@ def on_chat_message(msg):
         wait(msg, dao.HEAVEN)
         return
     elif 'sticker' in msg and msg['sticker']['file_id'] == amivalevrg:
-        replySticker(msg, atodosvalevrg)
+        replySticker(msg, amivalevrgtmb)
         return
-    elif 'sticker' in msg:
+    elif 'sticker' in msg and msg['sticker']['file_id'] == foca_gaaay:
+        responseDocument(msg, hagaaay_gif)
         return
 
     if not cmd.startswith('/') and not 'sticker' in msg:
