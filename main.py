@@ -33,6 +33,7 @@ foca_gaaay = u'CAADBAADcAQAApv7sgABifFfdnNmjjsC'
 kheberga = u'CAADAQADiwADJaHuBCxFUkncLVKjAg'
 
 iscoraline = r"\s?c(a|o)r(a|o)line\s?"
+ensalada = r"\s?ensalada\s?"
 isgay = r"\s?(gay|maricon|p?inche puto)\s?"
 isgod = r"\b((\s+dios|god)\b|\b(dios|god)\b)\s?"
 isnigga = r"\s(negro|niga|nigga|nigger)\s?.*"
@@ -43,7 +44,7 @@ hagaaay_gif = u'CgADAwADAQADhjxQTo1Kz-gOAQ_jAg'
 ikillu_gif = u'CgADBAADFaAAAloXZAe9o2B4i9CciwI'
 racists_gif = u'CgADBAADwKMAAlEXZAcPm6zqHWX1DAI'
 trabajaperro_gif = u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
-
+maradona_gif = u'CgADBAAD758AAvgaZAfNzwLnrluCJAI'
 
 def handle(msg):
     pprint(msg)
@@ -70,9 +71,9 @@ def replyDocument(msg, docid):
     bot.sendDocument(chat_id=chat_id, document=docid, reply_to_message_id=msgId)
 
 
-def responseDocument(msg, docid):
+def responseDocument(msg, docid, caption=None):
     chat_id = msg['chat']['id']
-    bot.sendDocument(chat_id=chat_id, document=docid)
+    bot.sendDocument(chat_id=chat_id, document=docid, caption=caption)
 
 def replySticker(msg, sticker):
     chat_id = msg['chat']['id']
@@ -136,6 +137,8 @@ def checkSpecialWords(msg):
         responseDocument(msg, racists_gif)
     elif re.search(trabajaperro, msg['text'], re.I | re.M) is not None:
         responseDocument(msg, trabajaperro_gif)
+    elif re.search(ensalada, msg['text'], re.I | re.M) is not None:
+        responseDocument(msg, maradona_gif, "ensalada?... noooooo!")
 
 def on_chat_message(msg):
     # if not has text or sticker
