@@ -8,8 +8,12 @@ statsT = db.table('stats')
 
 q = Query()
 
+#types
 HELL = 1
 HEAVEN = 2
+CANCEL = 3
+RESET = 4
+STOP = 5
 
 
 def GetAllStats():
@@ -55,7 +59,7 @@ def Update(user, type):
 def GetAnswer(type):
     rs = responsesT.search((q.t == type))
     i = random.randint(0, len(rs)-1)
-    return rs[i]["a"]
+    return rs[i]
 
 
 def InsertAnswer(res):

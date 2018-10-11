@@ -9,26 +9,62 @@ FUNC = "func"
 WAIT = "needWait"
 
 
+class Answerype():
+    TEXT = 1
+    STICKER = 2
+    GIF = 3
+    PHOTO = 4
+
 ticketWait = {}
+
+def getMsgLeeMan():
+    return {"a": 'que raro que tu... lee el manual!', "at": Answerype.TEXT}
 
 
 def goToHell(user, userSender, chat_id):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait": COMMANDS["/hell"][WAIT]
+    }
     if user == '':
-        return 'que raro que tu... lee el manual!', COMMANDS["/hell"][WAIT]
+        response["r"] = getMsgLeeMan()
+        response["needWait"] = False
+        return response 
 
     dao.Update(user,dao.HELL)
-    return dao.GetAnswer(dao.HELL), COMMANDS["/hell"][WAIT]
+    response["r"] = dao.GetAnswer(dao.HELL)
+    return response
 
 
 def goToHeaven(user, userSender, chat_id):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait": COMMANDS["/heaven"][WAIT]
+    }
+
     if user == '':
-        return 'que raro que tu... lee el manual!', COMMANDS["/heaven"][WAIT]
+        response["r"] = getMsgLeeMan()
+        response["needWait"] = False
+        return response
 
     dao.Update(user, dao.HEAVEN)
-    return dao.GetAnswer(dao.HEAVEN), COMMANDS["/heaven"][WAIT]
-
+    response["r"] = dao.GetAnswer(dao.HEAVEN)
+    return response
 
 def getStats(user, userSender, chat_id):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait": COMMANDS["/stats"][WAIT]
+    }
     stats = dao.GetStats(userSender)
 
     if stats != []:
@@ -38,21 +74,33 @@ def getStats(user, userSender, chat_id):
 
         if heaven > hell:
             emoji = u'\u271d\ufe0f'
+        response["r"]["a"] = 'Heaven: {}, Hell: {} ... {}'.format(heaven, hell, emoji)
+        return response
 
-        return 'Heaven: {}, Hell: {} ... {}'.format(heaven, hell, emoji), False
-   
-    return '{} la estadisticas no importan, vas al infierno de cualquier manera.'.format(userSender), COMMANDS["/stats"][WAIT]
+    response["r"]["a"] = '{} la estadisticas no importan, vas al infierno de cualquier manera.'.format(userSender)
+    return response
+
 
 def getAllStats(user, userSender, chat_id):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait":  COMMANDS["/all"][WAIT]
+    }
     if userSender != 'Tecnologer':
-        return "solo dios tiene ese poder", COMMANDS["/all"][WAIT]
+        response["r"]["a"] = "solo dios tiene ese poder"
+        return response
 
     stats = dao.GetAllStats()
 
     if len(stats) == 0:
-        return "no hay nada", False
+        response["r"]["a"] = "no hay nada"
+        response["needWait"]= False
+        return response
 
-    response = ""
+    res = ""
     for val in stats:
         heaven = val['heaven']
         hell = val["hell"]
@@ -62,29 +110,58 @@ def getAllStats(user, userSender, chat_id):
         if heaven > hell:
             emoji = u'\u271d\ufe0f'
 
-        response += '- {} -> Heaven: {}, Hell: {} ... {}\n'.format(
+        res += '- {} -> Heaven: {}, Hell: {} ... {}\n'.format(
             val["user"],  heaven, hell, emoji)
     
-    return response, COMMANDS["/all"][WAIT]
+    response["r"]["a"] = res
+    return response
+
 
 def cancel(user, userSender, chat_id):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait":  COMMANDS["/cancel"][WAIT]
+    }
     if not chat_id in ticketWait:
-        return "que vas a cancelar, no tienes nada", COMMANDS["/cancel"][WAIT]
+        response["r"]["a"] = "que vas a cancelar, no tienes nada"
+        return response
         
     del ticketWait[chat_id]
-    return "che rajon!", COMMANDS["/cancel"][WAIT]
+    response["r"] = dao.GetAnswer(dao.CANCEL)
+    return response
 
 
 def showHelp(user, userSender, chat_id):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait":  COMMANDS["/help"][WAIT]
+    }
     res = "Bot para telegram que registra las acciones buenas y malas de los usuarios.\n\n"
     for k, v in COMMANDS.iteritems():
         res += "- {} {}{}=> {}\n".format(k, v[PARAMS], "" if v[PARAMS]=="" else " ", v[DESC])
     
-    return res, COMMANDS["/help"][WAIT]
+    response["r"]["a"] = res
+    return response
 
 
 def resetData(user, userSender, chat_id):
-    return u"reset", COMMANDS["/reset"][WAIT]
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait":  COMMANDS["/reset"][WAIT]
+    }
+
+    response["r"] = dao.GetAnswer(dao.RESET)
+
+    return response
 
 def VerifyAlias(cmd):
     if cmd in alias:
@@ -104,16 +181,34 @@ def Wait(chat_id, user_id, type):
 
 
 def showAlias(comando, userSender, chat_id):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait":  COMMANDS["/alias"][WAIT]
+    }
     if comando == "":
-        return u'que raro que tu... lee el manual! (¬_¬)', COMMANDS["/alias"][WAIT]
+        response["r"]["a"] = u'que raro que tu... lee el manual! (¬_¬)'
+        return response
 
     res = "Alias para el comando {}\n\n".format(comando)
     for k, v in alias.iteritems():
         if v == comando:
             res += "- {}\n".format(k)
 
-    return res, COMMANDS["/alias"][WAIT]
 
+    response["r"]["a"] = res
+    return response
+
+
+def stop(comando, userSender, chat_id):
+    return {
+        "r": dao.GetAnswer(dao.STOP),
+        "needWait":  COMMANDS["/stop"][WAIT]
+    }
+
+# definicion de comandos
 COMMANDS = {
     "/hell":{
         FUNC: goToHell,
@@ -161,6 +256,12 @@ COMMANDS = {
         FUNC: showAlias,
         DESC: "Muestra el alias para el comando elegido",
         PARAMS: "</comando>",
+        WAIT: False
+    },
+    "/stop": {
+        FUNC: stop,
+        DESC: '"Detiene" el bot. Evitaria que siguiera leyendo mensajes.',
+        PARAMS: "",
         WAIT: False
     }
 }

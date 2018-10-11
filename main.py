@@ -6,8 +6,11 @@ import os
 import key
 import com
 import re
-from pprint import pprint
+import pathlib
 import dao
+from pprint import pprint
+from PIL import Image
+from io import BytesIO
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -36,7 +39,7 @@ iscoraline = r"\s?c(a|o)r(a|o)line\s?"
 ensalada = r"\s?ensalada\s?"
 isgay = r"\s?(gay|maricon|p?inche puto)\s?"
 isgod = r"\b((\s+dios|god)\b|\b(dios|god)\b)\s?"
-isnigga = r"\s(negro|niga|nigga|nigger)\s?.*"
+isnigga = r"\s?(negro|niga|nigga|nigger)\s?.*"
 trabajaperro = r"\s?trabaja,? perro.*"
 
 mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
@@ -45,6 +48,7 @@ ikillu_gif = u'CgADBAADFaAAAloXZAe9o2B4i9CciwI'
 racists_gif = u'CgADBAADwKMAAlEXZAcPm6zqHWX1DAI'
 trabajaperro_gif = u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
 maradona_gif = u'CgADBAAD758AAvgaZAfNzwLnrluCJAI'
+
 
 def handle(msg):
     pprint(msg)
@@ -74,6 +78,18 @@ def replyDocument(msg, docid):
 def responseDocument(msg, docid, caption=None):
     chat_id = msg['chat']['id']
     bot.sendDocument(chat_id=chat_id, document=docid, caption=caption)
+
+
+def responseImage(msg, photo, caption=None):
+    chat_id = msg['chat']['id']
+    photo = pathlib.Path(photo)
+    
+    im = Image.open(photo)
+    im.thumbnail((220, 130), Image.ANTIALIAS)
+    im.save(im.filename)
+
+    
+    bot.sendPhoto(chat_id=chat_id, photo=im, caption=caption)
 
 def replySticker(msg, sticker):
     chat_id = msg['chat']['id']
@@ -141,6 +157,8 @@ def checkSpecialWords(msg):
         responseDocument(msg, maradona_gif, "ensalada?... noooooo!")
 
 def on_chat_message(msg):
+    # responseImage(msg, "images/jesus1.jpg")
+    # return 
     # if not has text or sticker
     if isBot(msg) or (not 'text' in msg and not 'sticker' in msg):
         return
@@ -219,16 +237,24 @@ def on_chat_message(msg):
         return
     
    
-    response, needWait = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
+    response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
     
-    if response == "reset":
-        replyDocument(msg, mcdinero_gif)
-        return
+    answer = response["r"]["a"]
+    needWait = "needWait" in response and response["needWait"]
+    answerype = response["r"]["at"]
+
+    if answerype == com.Answerype.STICKER:
+        replySticker(msg, answer)
+    elif answerype == com.Answerype.GIF:
+        replyDocument(msg, answer)
+    elif answerype == com.Answerype.PHOTO:
+        responseImage(msg, answer)
+    else:  # answerype == com.Answerype.TEXT:
+        reply(msg, answer)
 
     if needWait:
         newRecord(userSender)
         
-    reply(msg, response)
 
 bot.message_loop({'chat': on_chat_message})
 
