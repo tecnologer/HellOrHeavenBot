@@ -1,5 +1,5 @@
 .vscode/
-*.json
+hellorheaven.json
 test/
 key.py
 /key.py*
