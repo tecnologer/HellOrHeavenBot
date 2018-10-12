@@ -11,9 +11,9 @@
             "at": 1
         },
         "3": {
-            "a": "ha ha!",
+            "a": "CAADAQADjQADJaHuBDCBEchp6mGFAg",
             "t": 1,
-            "at": 1
+            "at": 2
         },
         "4": {
             "a": "anda la osa!",
@@ -71,7 +71,7 @@
             "at": 1
         },
         "15": {
-            "a": "el pastel era mentira",
+            "a": "el pastel es mentira",
             "t": 2,
             "at": 1
         },
@@ -116,7 +116,7 @@
             "at": 2
         },
         "24": {
-            "a": "CAADAQADrwADJaHuBKBLrZ",
+            "a": "CAADAQAD1gEAAiRSnAABLOJEt9vzA_EC",
             "t": 5,
             "at": 2
         },
@@ -126,9 +126,64 @@
             "at": 2
         },
         "26": {
-            "a": "images/jesus1.jpg",
+            "a": "CAADAQAD0wEAAiRSnAABoM6Gk1SpD8EC",
+            "t": 2,
+            "at": 2
+        },
+        "27": {
+            "a": "CAADAQAD1AEAAiRSnAABXNNm0JIdl44C",
+            "t": 2,
+            "at": 2
+        },
+        "28": {
+            "a": "CAADAQAD1QEAAiRSnAAB6XT7OdBwGn0C",
             "t": 1,
-            "at": 4
+            "at": 2
+        },
+        "29": {
+            "a": "CAADAQADlgADJaHuBPzrbSkfjm9uAg",
+            "t": 1,
+            "at": 2
+        },
+        "30": {
+            "a": "CAADBQADgQMAAukKyANDdDlhDY7IuQI",
+            "t": 2,
+            "at": 2
+        },
+        "31": {
+            "a": "CAADBQADgAMAAukKyAOXWG874z7K-AI",
+            "t": 1,
+            "at": 2
+        },
+        "32": {
+            "a": "CAADAwADdQADJaHuBEiZlfsk70_zAg",
+            "t": 3,
+            "at": 2
+        },
+        "33": {
+            "a": "CAADAwADcgADJaHuBJRKzLJ2ZtyIAg",
+            "t": 3,
+            "at": 2
+        },
+        "34": {
+            "a": "CAADAQADngADJaHuBEiHJAmrgJWbAg",
+            "t": 1,
+            "at": 2
+        },
+        "35": {
+            "a": "Al·lahu-àkbar",
+            "t": 2,
+            "at": 1
+        },
+        "36": {
+            "a": "CgADAQADCwADkV8AAU54G2kOq4MdDgI",
+            "t": 1,
+            "at": 3
+        },
+        "37": {
+            "a": "CgADAQADAgADqE4AAU6MQQqToMZbLgI",
+            "t": 1,
+            "at": 3
         }
     }
 }
