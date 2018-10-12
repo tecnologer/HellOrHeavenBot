@@ -34,7 +34,8 @@ def goToHell(user, userSender, chat_id):
         response["needWait"] = False
         return response 
 
-    dao.Update(user,dao.HELL)
+    if user != "test":
+        dao.Update(user, dao.HELL)
     response["r"] = dao.GetAnswer(dao.HELL)
     return response
 
@@ -53,7 +54,9 @@ def goToHeaven(user, userSender, chat_id):
         response["needWait"] = False
         return response
 
-    dao.Update(user, dao.HEAVEN)
+
+    if user != "test":
+        dao.Update(user, dao.HEAVEN)
     response["r"] = dao.GetAnswer(dao.HEAVEN)
     return response
 
