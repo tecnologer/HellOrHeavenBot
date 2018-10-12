@@ -15,7 +15,6 @@ Bot para telegram que registra las acciones buenas y malas de los usuarios.
 - [telepot][3]: `pip install telepot`
 
 ## ToDo
-- Imprimir alias para los comandos
 - Documentar como usar stickers para comandos
 
 
