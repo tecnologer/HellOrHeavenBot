@@ -6,11 +6,10 @@ import os
 import key
 import com
 import re
-import pathlib
 import dao
 from pprint import pprint
-from PIL import Image
-from io import BytesIO
+
+dirname = os.path.dirname(__file__)
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -31,9 +30,9 @@ amivalevrg = u'CAADAQADiAADJaHuBD7kz0JCJne4Ag'
 atodosvalevrg = u'CAADAQADigADJaHuBEbW2qfTwX5XAg'
 uypuesperdon = u'CAADAQADogADJaHuBLFm_SWQWCPDAg'
 foca_gaaay = u'CAADBAADcAQAApv7sgABifFfdnNmjjsC'
-
-
+ora_bergha = u'CAADAQAD1wEAAiRSnAABvoSTCsK5ylcC'
 kheberga = u'CAADAQADiwADJaHuBCxFUkncLVKjAg'
+oseakhe = u'CAADBQADfgMAAukKyAMythx0wTDJDAI'
 
 iscoraline = r"\s?c(a|o)r(a|o)line\s?"
 ensalada = r"\s?ensalada\s?"
@@ -41,6 +40,7 @@ isgay = r"\s?(gay|maricon|p?inche puto)\s?"
 isgod = r"\b((\s+dios|god)\b|\b(dios|god)\b)\s?"
 isnigga = r"\s?(negro|niga|nigga|nigger)\s?.*"
 trabajaperro = r"\s?trabaja,? perro.*"
+inchebot = r".*(p?inche\s?bot|bot\s?(gay|joto|maricon|puto)).*"
 
 mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
 hagaaay_gif = u'CgADAwADAQADhjxQTo1Kz-gOAQ_jAg'
@@ -82,19 +82,19 @@ def responseDocument(msg, docid, caption=None):
 
 def responseImage(msg, photo, caption=None):
     chat_id = msg['chat']['id']
-    photo = pathlib.Path(photo)
-    
-    im = Image.open(photo)
-    im.thumbnail((220, 130), Image.ANTIALIAS)
-    im.save(im.filename)
+    photo = os.path.join(dirname, photo)
+    bot.sendPhoto(chat_id, open(photo, 'rb'), caption)
 
+def replySticker(msg, sticker, reply=True):
+    try:
+        chat_id = msg['chat']['id']
+        msgId = msg['message_id']
+        if not reply:
+            msgId = None
+        bot.sendSticker(chat_id=chat_id, sticker=sticker, reply_to_message_id=msgId)
+    except:
+        print("error al enviar sticker: ", sticker)
     
-    bot.sendPhoto(chat_id=chat_id, photo=im, caption=caption)
-
-def replySticker(msg, sticker):
-    chat_id = msg['chat']['id']
-    msgId = msg['message_id']
-    bot.sendSticker(chat_id=chat_id, sticker=sticker, reply_to_message_id=msgId)
 
 def getAwnser(type):
     return dao.GetAnswer(type)
@@ -134,7 +134,7 @@ def validTimeout(msg, sender):
             replySticker(msg, dejesedemamadas)
         elif timeout[sender]["count"] == 30:
             replySticker(msg, terco)
-        else:
+        elif timeout[sender]["count"] % 3 == 0:
             reply(msg, "esperate {} segundos".format(30-elapsed))
 
         return False
@@ -142,8 +142,10 @@ def validTimeout(msg, sender):
     return True
 
 
-def checkSpecialWords(msg):    
-    if re.search(iscoraline, msg['text'], re.I | re.M) is not None:
+def checkSpecialWords(msg):
+    if re.search(inchebot, msg['text'], re.I | re.M) is not None:
+        replySticker(msg, ora_bergha, False)
+    elif re.search(iscoraline, msg['text'], re.I | re.M) is not None:
         reply(msg, "si seras, si seras, que se llama Karelia, che terco!")
     elif re.search(isgay, msg['text'], re.I | re.M) is not None:
         responseDocument(msg, hagaaay_gif)
@@ -155,10 +157,22 @@ def checkSpecialWords(msg):
         responseDocument(msg, trabajaperro_gif)
     elif re.search(ensalada, msg['text'], re.I | re.M) is not None:
         responseDocument(msg, maradona_gif, "ensalada?... noooooo!")
+    
+
+def manageResponse(msg, response):
+    answer = response["r"]["a"]
+    answerype = response["r"]["at"]
+
+    if answerype == com.Answerype.STICKER:
+        replySticker(msg, answer)
+    elif answerype == com.Answerype.GIF:
+        replyDocument(msg, answer)
+    elif answerype == com.Answerype.PHOTO:
+        responseImage(msg, answer)
+    else:  # answerype == com.Answerype.TEXT:
+        reply(msg, answer)
 
 def on_chat_message(msg):
-    # responseImage(msg, "images/jesus1.jpg")
-    # return 
     # if not has text or sticker
     if isBot(msg) or (not 'text' in msg and not 'sticker' in msg):
         return
@@ -178,8 +192,7 @@ def on_chat_message(msg):
         user = msg['text'].split(' ')[0].replace('@', '')
 
         if user.startswith("/cancel"):
-            com.cancel("", "", chat_id)
-            replySticker(msg, kheberga)
+            manageResponse(msg, com.cancel("", "", chat_id))
             return 
         ignoreTimeout = True
         cmd = com.GetWaitingCmd(chat_id, user_id)
@@ -239,20 +252,10 @@ def on_chat_message(msg):
    
     response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
     
-    answer = response["r"]["a"]
+    manageResponse(msg, response)
+
     needWait = "needWait" in response and response["needWait"]
-    answerype = response["r"]["at"]
-
-    if answerype == com.Answerype.STICKER:
-        replySticker(msg, answer)
-    elif answerype == com.Answerype.GIF:
-        replyDocument(msg, answer)
-    elif answerype == com.Answerype.PHOTO:
-        responseImage(msg, answer)
-    else:  # answerype == com.Answerype.TEXT:
-        reply(msg, answer)
-
-    if needWait:
+    if needWait and userSender != "Tecnologer" and user != "test":
         newRecord(userSender)
         
 
