@@ -211,7 +211,7 @@ def checkWaitingAnswer(msg):
     if answerType == -1:
         del answerTransactions[chat_id][user_id]
         replySticker(msg, dejesedemamadas)
-        reply(msg, "Solo texto, sticker o gif. Vuelve a empezar", False)
+        reply(msg, "Solo texto, sticker o gif. Ahora por vivo, tienes que volver a empezar", False)
         return True
     
     answerObj = {
@@ -270,13 +270,15 @@ def addAnswer(msg):
     reply(
         msg, "Listo, respuesta almacenada!.")
 
+
 def on_chat_message(msg):
-    # if not has text or sticker
-    if isBot(msg) or (not 'text' in msg and not 'sticker' in msg and not "animation" in msg):
-        return
-    
     if checkWaitingAnswer(msg):
         return
+
+    # if not has text or sticker
+    if isBot(msg) or (not 'text' in msg and not 'sticker' in msg):
+        return
+    
 
     cmd = ''
     user = ''
