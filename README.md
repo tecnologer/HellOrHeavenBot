@@ -21,7 +21,7 @@ Bot para telegram que registra las acciones buenas y malas de los usuarios.
 Pruebalo: [t.me/hellorheavenbot][1]
 
 
-[1]:t.me/hellorheavenbot
+[1]: https://t.me/hellorheavenbot
 [2]: https://tinydb.readthedocs.io/en/latest/getting-started.html#installing-tinydb
 [3]: https://telepot.readthedocs.io/en/latest/
 
