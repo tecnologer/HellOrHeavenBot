@@ -16,6 +16,7 @@ sys.setdefaultencoding('utf-8')
 bot = telepot.Bot(key.BOT_KEY)  # token
 
 timeout = {}
+answerTransactions = {}
 
 tranquiloviejo = u"CAADAQADNwADzxSlAAEpVbCJbOTMsAI"
 awanta = u'CAADAQADqwADJaHuBMhw3ty2zbpjAg'
@@ -63,9 +64,12 @@ def getUserSender(msg):
 def isBot(msg):
     return 'from' in msg and 'is_bot' in msg['from'] and msg['from']['is_bot']
 
-def reply(msg, response):
+def reply(msg, response, reply=True):
     chat_id = msg['chat']['id']
     msgId = msg['message_id']
+    if not reply:
+        msgId = None
+
     bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msgId )
 
 
@@ -143,6 +147,9 @@ def validTimeout(msg, sender):
 
 
 def checkSpecialWords(msg):
+    if not "text" in msg:
+        return
+
     if re.search(inchebot, msg['text'], re.I | re.M) is not None:
         replySticker(msg, ora_bergha, False)
     elif re.search(iscoraline, msg['text'], re.I | re.M) is not None:
@@ -172,9 +179,103 @@ def manageResponse(msg, response):
     else:  # answerype == com.Answerype.TEXT:
         reply(msg, answer)
 
+
+def waitForAnswer(chat_id, user_id, tipo):
+    answerTransactions[chat_id] = {user_id: tipo}
+
+def isWaitingAnswer(chat_id, user_id):
+    return chat_id in answerTransactions and user_id in answerTransactions[chat_id]
+
+def checkWaitingAnswer(msg):
+    chat_id = msg['chat']['id']
+    user_id = msg["from"]['id']
+
+    if not isWaitingAnswer(chat_id, user_id):
+        return False
+
+    answer = ""
+    answerType = -1
+    if "text" in msg:
+        answer = msg["text"]
+        if answer.startswith("/"):
+            reply(msg, "Eso es un comando, no una respuesta", False)
+            return True
+        answerType = com.Answerype.TEXT
+    elif "sticker" in msg:
+        answer = msg["sticker"]['file_id']
+        answerType = com.Answerype.STICKER
+    elif "animation" in msg:
+        answer = msg["animation"]['file_id']
+        answerType = com.Answerype.GIF
+    
+    if answerType == -1:
+        del answerTransactions[chat_id][user_id]
+        replySticker(msg, dejesedemamadas)
+        reply(msg, "Solo texto, sticker o gif. Vuelve a empezar", False)
+        return True
+    
+    answerObj = {
+        "t": answerTransactions[chat_id][user_id],
+        "a": answer,
+        "at": answerType
+    }
+
+    dao.InsertAnswer(answerObj)
+
+    reply(
+        msg, "Listo, respuesta almacenada!.")
+
+    del answerTransactions[chat_id][user_id]
+    return True
+
+def addAnswer(msg):
+    chat_id = msg['chat']['id']
+    user_id = msg["from"]['id']
+    tokens = msg["text"].split(" ", 2)
+    
+    #solo comando
+    if len(tokens) < 2:
+        reply(
+            msg, "Es necesario especificar el tipo. /addanswer {}".format(com.COMMANDS["/addanswer"][com.PARAMS]))
+        return
+        
+    tipo = tokens[1]
+
+    if not tipo.isdigit():
+        reply(
+            msg, "Tipo debe ser un numero y solo puede tomar valor de:\n1.- Hell\n2.- Heaven\n3.- Cancel")
+        return
+
+    tipo = int(tipo)
+    if tipo < 1 and tipo > 3:
+        reply(
+            msg, "Tipo solo puede tomar valor de:\n1.- Hell\n2.- Heaven\n3.- Cancel")
+        return
+
+    #solo comando y tipo
+    if len(tokens) == 2:
+        waitForAnswer(chat_id, user_id, tipo)
+        reply(
+            msg, "Manda lo que quieras que responda. Puede ser un mensaje de texto, sticker o gif.")
+        return
+    
+    answer = tokens[2].strip()
+    answerObj = {
+        "t": tipo,
+        "a": answer,
+        "at": com.Answerype.TEXT
+    }
+    dao.InsertAnswer(answerObj)
+
+    reply(
+        msg, "Listo, respuesta almacenada!.")
+
 def on_chat_message(msg):
     # if not has text or sticker
-    if isBot(msg) or (not 'text' in msg and not 'sticker' in msg):
+    if isBot(msg) or (not 'text' in msg and not 'sticker' in msg and not "animation" in msg):
+        return
+    
+    if checkWaitingAnswer(msg):
         return
 
     cmd = ''
@@ -249,14 +350,15 @@ def on_chat_message(msg):
         reply(msg, u'solo dios puede juzgarte... nah!, los demas lo haran \U0001f602')
         return
     
-   
-    response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
-    
-    manageResponse(msg, response)
+    if cmd.startswith("/addanswer"):
+        addAnswer(msg)
+    else:
+        response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)    
+        manageResponse(msg, response)
 
-    needWait = "needWait" in response and response["needWait"]
-    if needWait and userSender != "Tecnologer" and user != "test":
-        newRecord(userSender)
+        needWait = "needWait" in response and response["needWait"]
+        if needWait and userSender != "Tecnologer" and user != "test":
+            newRecord(userSender)
         
 
 bot.message_loop({'chat': on_chat_message})

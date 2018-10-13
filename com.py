@@ -266,6 +266,12 @@ COMMANDS = {
         DESC: '"Detiene" el bot. Evitaria que siguiera leyendo mensajes.',
         PARAMS: "",
         WAIT: False
+    },
+    "/addanswer": {
+        # FUNC: addAnwser,
+        DESC: "Añade una respuesta para un tipo de comando. Donde tipo puede tomar valor de:\n1.- Hell\n2.- Heaven\n3.- Cancel",
+        PARAMS: "<tipo> [mensaje texto|sticker_id]",
+        WAIT: False
     }
 }
 
