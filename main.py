@@ -18,6 +18,11 @@ bot = telepot.Bot(key.BOT_KEY)  # token
 timeout = {}
 answerTransactions = {}
 
+#emojis
+emLike = u'\U0001f44d'
+emDislike = u'\U0001f44e'
+
+#stickers
 tranquiloviejo = u"CAADAQADNwADzxSlAAEpVbCJbOTMsAI"
 awanta = u'CAADAQADqwADJaHuBMhw3ty2zbpjAg'
 dejesedemamadas = u'CAADAQAD7wEAAs8UpQABdurS64LRGooC'
@@ -25,7 +30,6 @@ alapifu = u"CAADAQADkQADJaHuBAABSnzPxbzjJQI"
 ticketHell = u'CAADAQADnQADJaHuBGvY1E43XYjJAg'
 ticketHeaven = u'CAADAQADswADJaHuBEcjnhhUIqsPAg'
 terco = u'CAADAQADqgADJaHuBEK37px2YeW-Ag'
-
 amivalevrgtmb = u'CAADAQADtAADJaHuBJdeO7iayOyQAg'
 amivalevrg = u'CAADAQADiAADJaHuBD7kz0JCJne4Ag'
 atodosvalevrg = u'CAADAQADigADJaHuBEbW2qfTwX5XAg'
@@ -35,6 +39,7 @@ ora_bergha = u'CAADAQAD1wEAAiRSnAABvoSTCsK5ylcC'
 kheberga = u'CAADAQADiwADJaHuBCxFUkncLVKjAg'
 oseakhe = u'CAADBQADfgMAAukKyAMythx0wTDJDAI'
 
+# regex
 iscoraline = r"\s?c(a|o)r(a|o)line\s?"
 ensalada = r"\s?ensalada\s?"
 isgay = r"\s?(gay|maricon|p?inche puto)\s?"
@@ -43,6 +48,7 @@ isnigga = r"\s?(negro|niga|nigga|nigger)\s?.*"
 trabajaperro = r"\s?trabaja,? perro.*"
 inchebot = r".*(p?inche\s?bot|bot\s?(gay|joto|maricon|puto)).*"
 
+# gifs
 mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
 hagaaay_gif = u'CgADAwADAQADhjxQTo1Kz-gOAQ_jAg'
 ikillu_gif = u'CgADBAADFaAAAloXZAe9o2B4i9CciwI'
@@ -167,8 +173,8 @@ def checkSpecialWords(msg):
     
 
 def manageResponse(msg, response):
-    answer = response["r"]["a"]
-    answerype = response["r"]["at"]
+    answer = response["a"]
+    answerype = response["at"]
 
     if answerype == com.Answerype.STICKER:
         replySticker(msg, answer)
@@ -197,7 +203,12 @@ def checkWaitingAnswer(msg):
     answerType = -1
     if "text" in msg:
         answer = msg["text"]
-        if answer.startswith("/"):
+        if answer.startswith("/cancel"):
+            del answerTransactions[chat_id][user_id]
+            response = dao.GetAnswer(dao.CANCEL)
+            manageResponse(msg, response)
+            return True
+        elif answer.startswith("/"):
             reply(msg, "Eso es un comando, no una respuesta", False)
             return True
         answerType = com.Answerype.TEXT
@@ -220,7 +231,7 @@ def checkWaitingAnswer(msg):
         "at": answerType
     }
 
-    dao.InsertAnswer(answerObj)
+    dao.InsertProposal(answerObj)
 
     reply(
         msg, "Listo, respuesta almacenada!.")
@@ -272,11 +283,14 @@ def addAnswer(msg):
 
 
 def on_chat_message(msg):
+    if isBot(msg):
+        return 
+
     if checkWaitingAnswer(msg):
         return
 
     # if not has text or sticker
-    if isBot(msg) or (not 'text' in msg and not 'sticker' in msg):
+    if (not 'text' in msg and not 'sticker' in msg):
         return
     
 
@@ -295,7 +309,7 @@ def on_chat_message(msg):
         user = msg['text'].split(' ')[0].replace('@', '')
 
         if user.startswith("/cancel"):
-            manageResponse(msg, com.cancel("", "", chat_id))
+            manageResponse(msg, com.cancel("", "", chat_id)["r"])
             return 
         ignoreTimeout = True
         cmd = com.GetWaitingCmd(chat_id, user_id)
@@ -356,7 +370,7 @@ def on_chat_message(msg):
         addAnswer(msg)
     else:
         response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)    
-        manageResponse(msg, response)
+        manageResponse(msg, response["r"])
 
         needWait = "needWait" in response and response["needWait"]
         if needWait and userSender != "Tecnologer" and user != "test":

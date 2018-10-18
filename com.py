@@ -211,6 +211,40 @@ def stop(comando, userSender, chat_id):
         "needWait":  COMMANDS["/stop"][WAIT]
     }
 
+proposalVoting = {}
+
+def voteAnwser(msg, *args):
+    response = {
+        "r": {
+            "a": None,
+            "at": Answerype.TEXT
+        },
+        "needWait":  COMMANDS["/voteanswer"][WAIT]
+    }
+
+    user_id = msg["from"]["id"]
+    prop = dao.GetRandomProposal(user_id)
+
+    _for = ""
+
+    if prop["t"] == dao.HEAVEN:
+        _for = "/heaven"
+    elif prop["t"] == dao.HELL:
+        _for = "/hell"
+    elif prop["t"] == dao.CANCEL:
+        _for = "/cancel"
+    
+    a = ""
+    if prop["at"] == Answerype.TEXT:
+        a = 'Respondera "{}" despues de ejecutar el comando {}'.format(prop["a"], _for)
+    elif prop["at"] == Answerype.STICKER:
+        a = 'Respondera el siguiente sticker despues de ejecutar el comando {}'.format(_for)
+    elif prop["t"] == Answerype.GIF:
+        a = "/cancel"
+    elif prop["t"] == Answerype.PHOTO:
+        a = "/cancel"
+
+    return response
 # definicion de comandos
 COMMANDS = {
     "/hell":{
@@ -272,6 +306,12 @@ COMMANDS = {
         DESC: "Añade una respuesta para un tipo de comando. Donde tipo puede tomar valor de:\n1.- Hell\n2.- Heaven\n3.- Cancel",
         PARAMS: "<tipo> [mensaje texto|sticker_id]",
         WAIT: False
+    },
+    "/voteanswer": {
+        FUNC: voteAnwser,
+        DESC: u"Te mostrara una propuesta de respuesta y esperara que tu votacion usando: \U0001f44d o \U0001f44e",
+        PARAMS: "",
+        WAIT: False
     }
 }
 
@@ -284,5 +324,8 @@ alias = {
     u"/ayuda":    u"/help",
     u"/?":        u"/help",
     u"/no":       u"/cancel",
-    u"/cancela":  u"/cancel"
+    u"/cancela":  u"/cancel",
+    u"/add":      u"/addanswer",
+    u"/vote":     u"/voteanswer",
+    u"/votar":    u"/voteanswer",
 }
