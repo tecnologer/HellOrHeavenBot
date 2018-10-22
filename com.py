@@ -8,6 +8,8 @@ PARAMS = "params"
 FUNC = "func"
 WAIT = "needWait"
 
+emLike = u'\U0001f44d'
+emDislike = u'\U0001f44e'
 
 class Answerype():
     TEXT = 1
@@ -16,6 +18,7 @@ class Answerype():
     PHOTO = 4
 
 ticketWait = {}
+proposalVoting = {}
 
 def getMsgLeeMan():
     return {"a": 'que raro que tu... lee el manual!', "at": Answerype.TEXT}
@@ -211,9 +214,7 @@ def stop(comando, userSender, chat_id):
         "needWait":  COMMANDS["/stop"][WAIT]
     }
 
-proposalVoting = {}
-
-def voteAnwser(msg, *args):
+def proposalStartVoting(msg, *args):
     response = {
         "r": {
             "a": None,
@@ -223,28 +224,50 @@ def voteAnwser(msg, *args):
     }
 
     user_id = msg["from"]["id"]
-    prop = dao.GetRandomProposal(user_id)
+
+    if user_id in proposalVoting:
+        prop = proposalVoting[user_id]
+    else:
+        prop = dao.GetRandomProposal(user_id)
+        if prop is None:
+            response["r"]["a"] = "no hay nada para votar"
+            return response
 
     _for = ""
 
-    if prop["t"] == dao.HEAVEN:
+    if prop["proposal"]["t"] == dao.HEAVEN:
         _for = "/heaven"
-    elif prop["t"] == dao.HELL:
+    elif prop["proposal"]["t"] == dao.HELL:
         _for = "/hell"
-    elif prop["t"] == dao.CANCEL:
+    elif prop["proposal"]["t"] == dao.CANCEL:
         _for = "/cancel"
     
-    a = ""
-    if prop["at"] == Answerype.TEXT:
-        a = 'Respondera "{}" despues de ejecutar el comando {}'.format(prop["a"], _for)
-    elif prop["at"] == Answerype.STICKER:
-        a = 'Respondera el siguiente sticker despues de ejecutar el comando {}'.format(_for)
-    elif prop["t"] == Answerype.GIF:
-        a = "/cancel"
-    elif prop["t"] == Answerype.PHOTO:
-        a = "/cancel"
+    help = "Usa {} para darle un punto a favor, o {} para darle un punto en contra. Si llega a {} puntos a favor se usara como respuesta.".format(
+        emLike, emDislike, dao.MAXVOTES)
+    r = {"a": "", "at": Answerype.TEXT}
+    if prop["proposal"]["at"] == Answerype.TEXT:
+        r["a"] = 'Respondera "{}" despues de ejecutar el comando {}.\n{}'.format(
+            prop["proposal"]["a"], _for, help)
+    elif prop["proposal"]["at"] == Answerype.STICKER:
+        r["a"] = 'Respondera el siguiente sticker despues de ejecutar el comando {}.\n{}'.format(
+            _for, help)
+        r["file_id"] = prop["proposal"]["a"]
+        r["file_t"] = Answerype.STICKER
+    elif prop["proposal"]["at"] == Answerype.GIF:
+        r["a"] = 'Respondera el siguiente gif despues de ejecutar el comando {}.\n{}'.format(
+            _for, help)
+        r["file_id"] = prop["proposal"]["a"]
+        r["file_t"] = Answerype.GIF
+    elif prop["proposal"]["at"] == Answerype.PHOTO:
+        r["a"] = 'Respondera la siguiente imagen despues de ejecutar el comando {}.\n{}'.format(
+            _for, help)
+        r["file_id"] = prop["proposal"]["a"]
+        r["file_t"] = Answerype.PHOTO
 
+    proposalVoting[user_id] = prop
+    response["r"] = r
     return response
+
 # definicion de comandos
 COMMANDS = {
     "/hell":{
@@ -308,8 +331,8 @@ COMMANDS = {
         WAIT: False
     },
     "/voteanswer": {
-        FUNC: voteAnwser,
-        DESC: u"Te mostrara una propuesta de respuesta y esperara que tu votacion usando: \U0001f44d o \U0001f44e",
+        FUNC: proposalStartVoting,
+        DESC: u"Te mostrara una propuesta de respuesta y esperara tu votacion usando: {} o {}".format(emLike, emDislike),
         PARAMS: "",
         WAIT: False
     }
@@ -326,6 +349,8 @@ alias = {
     u"/no":       u"/cancel",
     u"/cancela":  u"/cancel",
     u"/add":      u"/addanswer",
+    u"/proposal": u"/addanswer",
+    u"/propuesta": u"/addanswer",
     u"/vote":     u"/voteanswer",
     u"/votar":    u"/voteanswer",
 }

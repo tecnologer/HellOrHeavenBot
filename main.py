@@ -38,6 +38,8 @@ foca_gaaay = u'CAADBAADcAQAApv7sgABifFfdnNmjjsC'
 ora_bergha = u'CAADAQAD1wEAAiRSnAABvoSTCsK5ylcC'
 kheberga = u'CAADAQADiwADJaHuBCxFUkncLVKjAg'
 oseakhe = u'CAADBQADfgMAAukKyAMythx0wTDJDAI'
+gatolike = u'CAADAQADpgADJaHuBGgS8JEkEOvuAg'
+
 
 # regex
 iscoraline = r"\s?c(a|o)r(a|o)line\s?"
@@ -184,6 +186,17 @@ def manageResponse(msg, response):
         responseImage(msg, answer)
     else:  # answerype == com.Answerype.TEXT:
         reply(msg, answer)
+    
+    if not "file_id" in response and not "file_t" in response:
+        return
+
+    if response["file_t"] == com.Answerype.STICKER:
+        replySticker(msg, response["file_id"])
+    elif response["file_t"] == com.Answerype.GIF:
+        replyDocument(msg, response["file_id"])
+    elif response["file_t"] == com.Answerype.PHOTO:
+        responseImage(msg, response["file_id"])
+
 
 
 def waitForAnswer(chat_id, user_id, tipo):
@@ -234,7 +247,7 @@ def checkWaitingAnswer(msg):
     dao.InsertProposal(answerObj)
 
     reply(
-        msg, "Listo, respuesta almacenada!.")
+        msg, "Listo, la propuesta para respuesta ha sido almacenada!. Usa el comando /voteanswer para votar por las respuestas mas originales.")
 
     del answerTransactions[chat_id][user_id]
     return True
@@ -276,11 +289,23 @@ def addAnswer(msg):
         "a": answer,
         "at": com.Answerype.TEXT
     }
-    dao.InsertAnswer(answerObj)
+    dao.InsertProposal(answerObj)
 
     reply(
-        msg, "Listo, respuesta almacenada!.")
+        msg, "Listo, la propuesta para respuesta ha sido almacenada!. Usa el comando /voteanswer para votar por las respuestas mas originales.")
 
+
+def IsVatotation(msg):
+    user_id = msg["from"]["id"]
+    return user_id in com.proposalVoting and "text" in msg and (msg["text"].startswith(emLike) or msg["text"].startswith(emDislike))
+
+
+def AddVotation(msg):
+    user_id = msg["from"]["id"]
+    isUp = msg["text"].startswith(emLike)
+    dao.UpdateScore(user_id, com.proposalVoting[user_id], isUp)
+    del com.proposalVoting[user_id]
+    replySticker(msg, gatolike, False)
 
 def on_chat_message(msg):
     if isBot(msg):
@@ -289,6 +314,9 @@ def on_chat_message(msg):
     if checkWaitingAnswer(msg):
         return
 
+    if IsVatotation(msg):
+        AddVotation(msg)
+        return 
     # if not has text or sticker
     if (not 'text' in msg and not 'sticker' in msg):
         return
@@ -368,8 +396,11 @@ def on_chat_message(msg):
     
     if cmd.startswith("/addanswer"):
         addAnswer(msg)
+    elif cmd.startswith("/voteanswer"):
+        response = com.proposalStartVoting(msg)
+        manageResponse(msg, response["r"])
     else:
-        response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)    
+        response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
         manageResponse(msg, response["r"])
 
         needWait = "needWait" in response and response["needWait"]

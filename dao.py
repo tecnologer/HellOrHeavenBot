@@ -87,7 +87,7 @@ def InsertProposal(prop):
 def GetRandomProposal(user_id):    
     rs = proposalsT.search( (~ q.voters.all([user_id])) & (q.upvote < MAXVOTES) & (q.downvote < MAXVOTES) )
     if len(rs) == 0:
-        return ""
+        return None
     elif len(rs) == 1:
         return rs[0]
 
@@ -101,4 +101,10 @@ def UpdateScore(user_id, prop, isUp):
         prop["downvote"] += 1
     
     prop["voters"].append(user_id)
-    proposalsT.update(prop, doc_ids=[prop.doc_id])
+
+    if prop["upvote"] >= MAXVOTES:
+        InsertAnswer(prop["proposal"])
+        proposalsT.remove(doc_ids=[prop.doc_id])
+    else:
+        proposalsT.update(prop, doc_ids=[prop.doc_id])
+
