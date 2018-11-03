@@ -20,11 +20,18 @@ class Answerype():
 ticketWait = {}
 proposalVoting = {}
 
+def getUserId(msg):
+    user_id = None
+    if "from" in msg and "id" in msg["from"]:
+        user_id = msg["from"]["id"]
+    
+    return user_id
+
 def getMsgLeeMan():
     return {"a": 'que raro que tu... lee el manual!', "at": Answerype.TEXT}
 
 
-def goToHell(user, userSender, chat_id):
+def goToHell(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
@@ -32,6 +39,7 @@ def goToHell(user, userSender, chat_id):
         },
         "needWait": COMMANDS["/hell"][WAIT]
     }
+
     if user == '':
         response["r"] = getMsgLeeMan()
         response["needWait"] = False
@@ -43,7 +51,7 @@ def goToHell(user, userSender, chat_id):
     return response
 
 
-def goToHeaven(user, userSender, chat_id):
+def goToHeaven(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
@@ -63,7 +71,7 @@ def goToHeaven(user, userSender, chat_id):
     response["r"] = dao.GetAnswer(dao.HEAVEN)
     return response
 
-def getStats(user, userSender, chat_id):
+def getStats(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
@@ -71,8 +79,14 @@ def getStats(user, userSender, chat_id):
         },
         "needWait": COMMANDS["/stats"][WAIT]
     }
-    stats = dao.GetStats(userSender)
 
+    user_id = getUserId(msg)
+
+    if not user_id is None:
+        dao.Update(userSender, None, user_id)
+
+    stats = dao.GetStats(userSender, user_id)
+    
     if stats != []:
         hell = stats[0]['hell']
         heaven = stats[0]['heaven']
@@ -87,7 +101,7 @@ def getStats(user, userSender, chat_id):
     return response
 
 
-def getAllStats(user, userSender, chat_id):
+def getAllStats(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
@@ -123,7 +137,7 @@ def getAllStats(user, userSender, chat_id):
     return response
 
 
-def cancel(user, userSender, chat_id):
+def cancel(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
@@ -140,7 +154,7 @@ def cancel(user, userSender, chat_id):
     return response
 
 
-def showHelp(user, userSender, chat_id):
+def showHelp(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
@@ -156,7 +170,7 @@ def showHelp(user, userSender, chat_id):
     return response
 
 
-def resetData(user, userSender, chat_id):
+def resetData(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,

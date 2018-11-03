@@ -400,7 +400,7 @@ def on_chat_message(msg):
         response = com.proposalStartVoting(msg)
         manageResponse(msg, response["r"])
     else:
-        response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id)
+        response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id, msg)
         manageResponse(msg, response["r"])
 
         needWait = "needWait" in response and response["needWait"]

@@ -16,36 +16,38 @@ CANCEL = 3
 RESET = 4
 STOP = 5
 
-MAXVOTES = 10
+MAXVOTES = 3
 
 def GetAllStats():
     return statsT.all()
 
 
-def GetStats(user):
-    user = "^{}$".format(user)
-    return statsT.search(q.user.matches(user, flags=re.IGNORECASE))
+def GetStats(user, user_id=None):
+    return statsT.search((q.user==user) | (q.user_id==user_id))
+    # user = "^{}$".format(user)
+    # return statsT.search(q.user.matches(user, flags=re.IGNORECASE))
 
 def Insert(userdb):
     statsT.insert(userdb)
 
-def Update(user, type):
+def Update(user, type, user_id=None):
     try:
         userdb = GetStats(user)
         isnew = False
 
         if userdb == []:
-            userdb = {"user": user, 'hell': 0, 'heaven': 0}
+            userdb = {"user": user, 'hell': 0, 'heaven': 0, "user_id": user_id}
             isnew = True
         else:
             userdb = userdb[0]
+
+        if not "user_id" in userdb:
+            userdb["user_id"] = user_id
 
         if type == HELL:
             userdb['hell'] += 1
         elif type == HEAVEN:
             userdb['heaven'] += 1
-        else:
-            return False
 
         if isnew:
            Insert(userdb)
