@@ -337,11 +337,11 @@ def on_chat_message(msg):
         user = msg['text'].split(' ')[0].replace('@', '')
 
         if user.startswith("/cancel"):
-            manageResponse(msg, com.cancel("", "", chat_id)["r"])
+            manageResponse(msg, com.cancel("", "", chat_id, msg)["r"])
             return 
         ignoreTimeout = True
         cmd = com.GetWaitingCmd(chat_id, user_id)
-        com.cancel("", "", chat_id)
+        com.cancel("", "", chat_id, msg)
     elif 'text' in msg:
         cmds = msg['text'].split(' ')
         response = ''

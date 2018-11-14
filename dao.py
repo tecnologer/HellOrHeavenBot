@@ -23,7 +23,10 @@ def GetAllStats():
 
 
 def GetStats(user, user_id=None):
-    return statsT.search((q.user==user) | (q.user_id==user_id))
+    if not user_id is None:
+        return statsT.search((q.user_id == user_id) | (q.user == user))
+    
+    return statsT.search(q.user == user)
     # user = "^{}$".format(user)
     # return statsT.search(q.user.matches(user, flags=re.IGNORECASE))
 
