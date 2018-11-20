@@ -42,13 +42,14 @@ gatolike = u'CAADAQADpgADJaHuBGgS8JEkEOvuAg'
 
 
 # regex
-iscoraline = r"\s?c(a|o)r(a|o)line\s?"
-ensalada = r"\s?ensalada\s?"
-isgay = r"\s?(gay|maricon|p?inche puto)\s?"
+iscoraline = r"\s?(k|c)(a|o)r(a|o)line\s?"
+ensalada = r"\s?ensalada(s)?\s?"
+isgay = r"\s?(gay|maricon|joto|p?inch(e|i) puto)\s?"
 isgod = r"\b((\s+dios|god)\b|\b(dios|god)\b)\s?"
+isallah = r"\b((\s+allah|ala)\b|\b(allah|ala)\b)\s?"
 isnigga = r"\s?(negro|niga|nigga|nigger)\s?.*"
 trabajaperro = r"\s?trabaja,? perro.*"
-inchebot = r".*(p?inche\s?bot|bot\s?(gay|joto|maricon|puto)).*"
+inchebot = r".*(p?inch(e|i)\s?bot|bot\s?(gay|joto|maricon|puto)).*"
 
 # gifs
 mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
@@ -57,6 +58,8 @@ ikillu_gif = u'CgADBAADFaAAAloXZAe9o2B4i9CciwI'
 racists_gif = u'CgADBAADwKMAAlEXZAcPm6zqHWX1DAI'
 trabajaperro_gif = u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
 maradona_gif = u'CgADBAAD758AAvgaZAfNzwLnrluCJAI'
+carlton_gif = u'CgADBAADcZ8AAmgXZAfrrj1C3Ln98gI'
+
 
 
 def handle(msg):
@@ -160,12 +163,14 @@ def checkSpecialWords(msg):
 
     if re.search(inchebot, msg['text'], re.I | re.M) is not None:
         replySticker(msg, ora_bergha, False)
-    elif re.search(iscoraline, msg['text'], re.I | re.M) is not None:
+    elif re.search(iscoraline, msg['text'], re.I | re.M) is not None and msg["from"]["id"] == 17760842:
         reply(msg, "si seras, si seras, que se llama Karelia, che terco!")
     elif re.search(isgay, msg['text'], re.I | re.M) is not None:
         responseDocument(msg, hagaaay_gif)
     elif re.search(isgod, msg['text'], re.I | re.M) is not None:
         responseDocument(msg, ikillu_gif)
+    elif re.search(isallah, msg['text'], re.I | re.M) is not None:
+        responseDocument(msg, carlton_gif)
     elif re.search(isnigga, msg['text'], re.I | re.M) is not None:
         responseDocument(msg, racists_gif)
     elif re.search(trabajaperro, msg['text'], re.I | re.M) is not None:
@@ -307,8 +312,11 @@ def AddVotation(msg):
     del com.proposalVoting[user_id]
     replySticker(msg, gatolike, False)
 
+def isEditing(msg):
+    return "edit_date" in msg
+
 def on_chat_message(msg):
-    if isBot(msg):
+    if isBot(msg) or isEditing(msg):
         return 
 
     if checkWaitingAnswer(msg):
