@@ -7,6 +7,7 @@ import key
 import com
 import re
 import dao
+import base64
 from pprint import pprint
 
 dirname = os.path.dirname(__file__)
@@ -46,7 +47,7 @@ iscoraline = r"\s?(k|c)(a|o)r(a|o)line\s?"
 ensalada = r"\s?ensalada(s)?\s?"
 isgay = r"\s?(gay|maricon|joto|p?inch(e|i) puto)\s?"
 isgod = r"\b((\s+dios|god)\b|\b(dios|god)\b)\s?"
-isallah = r"\b((\s+allah|ala)\b|\b(allah|ala)\b)\s?"
+isallah = r"\b((\s+al(lah|a|\xe1))\b|\b(al(lah|a|\xe1))\b)\s?"
 isnigga = r"\s?(negro|niga|nigga|nigger)\s?.*"
 trabajaperro = r"\s?trabaja,? perro.*"
 inchebot = r".*(p?inch(e|i)\s?bot|bot\s?(gay|joto|maricon|puto)).*"
@@ -161,23 +162,29 @@ def checkSpecialWords(msg):
     if not "text" in msg:
         return
 
-    if re.search(inchebot, msg['text'], re.I | re.M) is not None:
+    if textMatch(inchebot, msg['text']):
         replySticker(msg, ora_bergha, False)
-    elif re.search(iscoraline, msg['text'], re.I | re.M) is not None and msg["from"]["id"] == 17760842:
+    elif textMatch(iscoraline, msg['text']) and msg["from"]["id"] == 17760842:
         reply(msg, "si seras, si seras, que se llama Karelia, che terco!")
-    elif re.search(isgay, msg['text'], re.I | re.M) is not None:
+    elif textMatch(isgay, msg['text']):
         responseDocument(msg, hagaaay_gif)
-    elif re.search(isgod, msg['text'], re.I | re.M) is not None:
+    elif textMatch(isgod, msg['text']):
         responseDocument(msg, ikillu_gif)
-    elif re.search(isallah, msg['text'], re.I | re.M) is not None:
+    elif textMatch(isallah, msg['text']):
         responseDocument(msg, carlton_gif)
-    elif re.search(isnigga, msg['text'], re.I | re.M) is not None:
+    elif textMatch(isnigga, msg['text']):
         responseDocument(msg, racists_gif)
-    elif re.search(trabajaperro, msg['text'], re.I | re.M) is not None:
+    elif textMatch(trabajaperro, msg['text']):
         responseDocument(msg, trabajaperro_gif)
-    elif re.search(ensalada, msg['text'], re.I | re.M) is not None:
+    elif textMatch(ensalada, msg['text']):
         responseDocument(msg, maradona_gif, "ensalada?... noooooo!")
     
+
+def textMatch(regex, test_str):
+    matches = re.search(
+        regex, test_str, re.MULTILINE | re.UNICODE | re.IGNORECASE)
+
+    return matches is not None
 
 def manageResponse(msg, response):
     answer = response["a"]
@@ -325,6 +332,11 @@ def on_chat_message(msg):
     if IsVatotation(msg):
         AddVotation(msg)
         return 
+    #u'file_id' (140128345684368):u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
+
+    if "document" in msg and msg["document"]["file_id"] == trabajaperro_gif:
+        reply(msg, "trabaja, perro!", False)
+        return
     # if not has text or sticker
     if (not 'text' in msg and not 'sticker' in msg):
         return
