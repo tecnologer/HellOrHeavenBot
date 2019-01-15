@@ -60,7 +60,9 @@ racists_gif = u'CgADBAADwKMAAlEXZAcPm6zqHWX1DAI'
 trabajaperro_gif = u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
 maradona_gif = u'CgADBAAD758AAvgaZAfNzwLnrluCJAI'
 carlton_gif = u'CgADBAADcZ8AAmgXZAfrrj1C3Ln98gI'
-
+vanndame_street = u'CgADAwADBwADpFcITFLjOjfn8IfZAg'
+vanndame_dancing1 = u'CgADBAADxY8AAlsdZAcjIh--PzkbtwI'
+vanndame_dancing2 = u'CgADAwADAQADmEhBTBW3PNcv7nfcAg'
 
 
 def handle(msg):
@@ -76,18 +78,19 @@ def getUserSender(msg):
 def isBot(msg):
     return 'from' in msg and 'is_bot' in msg['from'] and msg['from']['is_bot']
 
-def reply(msg, response, reply=True):
+def reply(msg, response, replyTo=True):
     chat_id = msg['chat']['id']
     msgId = msg['message_id']
-    if not reply:
+    if not replyTo:
         msgId = None
 
     bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msgId )
 
 
-def replyDocument(msg, docid):
+def replyDocument(msg, docid, replyTo = True):
     chat_id = msg['chat']['id']
-    msgId = msg['message_id']
+    msgId = replyTo if msg['message_id'] else None
+
     bot.sendDocument(chat_id=chat_id, document=docid, reply_to_message_id=msgId)
 
 
@@ -322,6 +325,30 @@ def AddVotation(msg):
 def isEditing(msg):
     return "edit_date" in msg
 
+def checkDocuments(msg):
+    if not "document" in msg or not "file_id" in msg["document"]:
+        return False
+    docId = msg["document"]["file_id"]
+    
+    if docId == trabajaperro_gif:
+        reply(msg, "trabaja, perro!", False)
+        return True
+    
+    if docId == vanndame_dancing1 or docId == vanndame_dancing2:
+        replyDocument(msg, vanndame_street)
+        return True
+    
+    if docId == vanndame_street:
+        r = random.randint(1, 2)
+        if r == 1:
+            replyDocument(msg, vanndame_dancing1, False)
+        else:
+            replyDocument(msg, vanndame_dancing2, False)
+
+        return True
+
+    return False
+
 def on_chat_message(msg):
     if isBot(msg) or isEditing(msg):
         return 
@@ -334,9 +361,9 @@ def on_chat_message(msg):
         return 
     #u'file_id' (140128345684368):u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
 
-    if "document" in msg and msg["document"]["file_id"] == trabajaperro_gif:
-        reply(msg, "trabaja, perro!", False)
+    if checkDocuments(msg):
         return
+
     # if not has text or sticker
     if (not 'text' in msg and not 'sticker' in msg):
         return
