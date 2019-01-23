@@ -8,6 +8,7 @@ import com
 import re
 import dao
 import base64
+import customanswer as ca
 from pprint import pprint
 
 dirname = os.path.dirname(__file__)
@@ -40,17 +41,11 @@ ora_bergha = u'CAADAQAD1wEAAiRSnAABvoSTCsK5ylcC'
 kheberga = u'CAADAQADiwADJaHuBCxFUkncLVKjAg'
 oseakhe = u'CAADBQADfgMAAukKyAMythx0wTDJDAI'
 gatolike = u'CAADAQADpgADJaHuBGgS8JEkEOvuAg'
+kike = u'CAADAQAD5AEAAiRSnAABTkxC4DiGyCMC'
 
 
 # regex
 iscoraline = r"\s?(k|c)(a|o)r(a|o)line\s?"
-ensalada = r"\s?ensalada(s)?\s?"
-isgay = r"\s?(gay|maricon|joto|p?inch(e|i) puto)\s?"
-isgod = r"\b((\s+dios|god)\b|\b(dios|god)\b)\s?"
-isallah = r"\b((\s+al(lah|a|\xe1))\b|\b(al(lah|a|\xe1))\b)\s?"
-isnigga = r"\s?(negro|niga|nigga|nigger)\s?.*"
-trabajaperro = r"\s?trabaja,? perro.*"
-inchebot = r".*(p?inch(e|i)\s?bot|bot\s?(gay|joto|maricon|puto)).*"
 
 # gifs
 mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
@@ -165,22 +160,15 @@ def checkSpecialWords(msg):
     if not "text" in msg:
         return
 
-    if textMatch(inchebot, msg['text']):
-        replySticker(msg, ora_bergha, False)
-    elif textMatch(iscoraline, msg['text']) and msg["from"]["id"] == 17760842:
+    customAnswer = ca.ValidateCustomAnswer(msg)
+    if not customAnswer is None:
+        manageResponse(msg, customAnswer["r"])
+        return
+
+    # if textMatch(inchebot, msg['text']):
+    #     replySticker(msg, ora_bergha, False)
+    if textMatch(iscoraline, msg['text']) and msg["from"]["id"] == 17760842:
         reply(msg, "si seras, si seras, que se llama Karelia, che terco!")
-    elif textMatch(isgay, msg['text']):
-        responseDocument(msg, hagaaay_gif)
-    elif textMatch(isgod, msg['text']):
-        responseDocument(msg, ikillu_gif)
-    elif textMatch(isallah, msg['text']):
-        responseDocument(msg, carlton_gif)
-    elif textMatch(isnigga, msg['text']):
-        responseDocument(msg, racists_gif)
-    elif textMatch(trabajaperro, msg['text']):
-        responseDocument(msg, trabajaperro_gif)
-    elif textMatch(ensalada, msg['text']):
-        responseDocument(msg, maradona_gif, "ensalada?... noooooo!")
     
 
 def textMatch(regex, test_str):
@@ -193,11 +181,11 @@ def manageResponse(msg, response):
     answer = response["a"]
     answerype = response["at"]
 
-    if answerype == com.Answerype.STICKER:
+    if answerype == com.AnswerType.STICKER:
         replySticker(msg, answer)
-    elif answerype == com.Answerype.GIF:
+    elif answerype == com.AnswerType.GIF:
         replyDocument(msg, answer)
-    elif answerype == com.Answerype.PHOTO:
+    elif answerype == com.AnswerType.PHOTO:
         responseImage(msg, answer)
     else:  # answerype == com.Answerype.TEXT:
         reply(msg, answer)
@@ -205,11 +193,11 @@ def manageResponse(msg, response):
     if not "file_id" in response and not "file_t" in response:
         return
 
-    if response["file_t"] == com.Answerype.STICKER:
+    if response["file_t"] == com.AnswerType.STICKER:
         replySticker(msg, response["file_id"])
-    elif response["file_t"] == com.Answerype.GIF:
+    elif response["file_t"] == com.AnswerType.GIF:
         replyDocument(msg, response["file_id"])
-    elif response["file_t"] == com.Answerype.PHOTO:
+    elif response["file_t"] == com.AnswerType.PHOTO:
         responseImage(msg, response["file_id"])
 
 
@@ -239,13 +227,13 @@ def checkWaitingAnswer(msg):
         elif answer.startswith("/"):
             reply(msg, "Eso es un comando, no una respuesta", False)
             return True
-        answerType = com.Answerype.TEXT
+        answerType = com.AnswerType.TEXT
     elif "sticker" in msg:
         answer = msg["sticker"]['file_id']
-        answerType = com.Answerype.STICKER
+        answerType = com.AnswerType.STICKER
     elif "animation" in msg:
         answer = msg["animation"]['file_id']
-        answerType = com.Answerype.GIF
+        answerType = com.AnswerType.GIF
     
     if answerType == -1:
         del answerTransactions[chat_id][user_id]
@@ -302,7 +290,7 @@ def addAnswer(msg):
     answerObj = {
         "t": tipo,
         "a": answer,
-        "at": com.Answerype.TEXT
+        "at": com.AnswerType.TEXT
     }
     dao.InsertProposal(answerObj)
 
@@ -354,6 +342,12 @@ def on_chat_message(msg):
         return 
 
     if checkWaitingAnswer(msg):
+        return
+    
+    if ca.IsWaiting(msg):
+        response = ca.ValidateMsg(msg)
+        if "r" in response:
+            manageResponse(msg, response["r"])
         return
 
     if IsVatotation(msg):

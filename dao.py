@@ -6,6 +6,7 @@ db = TinyDB('hellorheaven.json')
 responsesT = db.table('responses')
 proposalsT = db.table('proposals')
 statsT = db.table('stats')
+customAnswerT = db.table('customanswer')
 
 q = Query()
 
@@ -113,3 +114,19 @@ def UpdateScore(user_id, prop, isUp):
     else:
         proposalsT.update(prop, doc_ids=[prop.doc_id])
 
+
+def InsertCustomAnswer(regex, atype, author, answer=None):
+    newAnswer={
+        "regex": regex,
+        "type": atype,
+        "author": author,
+    }
+
+    if not answer is None:
+        newAnswer["answer"] = answer
+
+    customAnswerT.insert(newAnswer)
+
+
+def GetCustomAnswer():
+    return customAnswerT.all()

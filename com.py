@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import dao
+import customanswer as ca
 
 DESC = "desc"
 PARAMS = "params"
@@ -11,7 +12,7 @@ WAIT = "needWait"
 emLike = u'\U0001f44d'
 emDislike = u'\U0001f44e'
 
-class Answerype():
+class AnswerType():
     TEXT = 1
     STICKER = 2
     GIF = 3
@@ -28,14 +29,14 @@ def getUserId(msg):
     return user_id
 
 def getMsgLeeMan():
-    return {"a": 'que raro que tu... lee el manual!', "at": Answerype.TEXT}
+    return {"a": 'que raro que tu... lee el manual!', "at": AnswerType.TEXT}
 
 
 def goToHell(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait": COMMANDS["/hell"][WAIT]
     }
@@ -55,7 +56,7 @@ def goToHeaven(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait": COMMANDS["/heaven"][WAIT]
     }
@@ -75,7 +76,7 @@ def getStats(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait": COMMANDS["/stats"][WAIT]
     }
@@ -105,7 +106,7 @@ def getAllStats(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait":  COMMANDS["/all"][WAIT]
     }
@@ -141,7 +142,7 @@ def cancel(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait":  COMMANDS["/cancel"][WAIT]
     }
@@ -158,7 +159,7 @@ def showHelp(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait":  COMMANDS["/help"][WAIT]
     }
@@ -174,7 +175,7 @@ def resetData(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait":  COMMANDS["/reset"][WAIT]
     }
@@ -204,7 +205,7 @@ def showAlias(comando, userSender, chat_id):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait":  COMMANDS["/alias"][WAIT]
     }
@@ -232,7 +233,7 @@ def proposalStartVoting(msg, *args):
     response = {
         "r": {
             "a": None,
-            "at": Answerype.TEXT
+            "at": AnswerType.TEXT
         },
         "needWait":  COMMANDS["/voteanswer"][WAIT]
     }
@@ -258,30 +259,68 @@ def proposalStartVoting(msg, *args):
     
     help = "Usa {} para darle un punto a favor, o {} para darle un punto en contra. Si llega a {} puntos a favor se usara como respuesta.".format(
         emLike, emDislike, dao.MAXVOTES)
-    r = {"a": "", "at": Answerype.TEXT}
-    if prop["proposal"]["at"] == Answerype.TEXT:
+    r = {"a": "", "at": AnswerType.TEXT}
+    if prop["proposal"]["at"] == AnswerType.TEXT:
         r["a"] = 'Respondera "{}" despues de ejecutar el comando {}.\n{}'.format(
             prop["proposal"]["a"], _for, help)
-    elif prop["proposal"]["at"] == Answerype.STICKER:
+    elif prop["proposal"]["at"] == AnswerType.STICKER:
         r["a"] = 'Respondera el siguiente sticker despues de ejecutar el comando {}.\n{}'.format(
             _for, help)
         r["file_id"] = prop["proposal"]["a"]
-        r["file_t"] = Answerype.STICKER
-    elif prop["proposal"]["at"] == Answerype.GIF:
+        r["file_t"] = AnswerType.STICKER
+    elif prop["proposal"]["at"] == AnswerType.GIF:
         r["a"] = 'Respondera el siguiente gif despues de ejecutar el comando {}.\n{}'.format(
             _for, help)
         r["file_id"] = prop["proposal"]["a"]
-        r["file_t"] = Answerype.GIF
-    elif prop["proposal"]["at"] == Answerype.PHOTO:
+        r["file_t"] = AnswerType.GIF
+    elif prop["proposal"]["at"] == AnswerType.PHOTO:
         r["a"] = 'Respondera la siguiente imagen despues de ejecutar el comando {}.\n{}'.format(
             _for, help)
         r["file_id"] = prop["proposal"]["a"]
-        r["file_t"] = Answerype.PHOTO
+        r["file_t"] = AnswerType.PHOTO
 
     proposalVoting[user_id] = prop
     response["r"] = r
     return response
 
+
+def addCustomAnswer(user, userSender, chat_id, msg):
+    response = {
+        "r": {
+            "a": None,
+            "at": AnswerType.TEXT
+        },
+        "needWait":  COMMANDS["/customanswer"][WAIT]
+    }    
+    userSender = msg["from"]["id"]
+
+    if userSender != 10244644:
+        response["r"]["a"] = "Esta opcion es solo para Allah. Para activarlo envia /allahmode"
+        return response
+
+    tokens = msg["text"].split(" ", 1)
+
+    if len(tokens) < 2:
+        response["r"]["a"] = "La expresion regular es necesaria. /customanswer <regex> [mensaje]"
+        return response
+    
+    regex = tokens[1]
+
+    ca.AddForWaiting(regex, userSender)
+    response["r"]["a"] = "El siguiente mensaje que mandes se tomara como respuesta, puede ser texto, sticker o gif."
+    return response
+
+
+def allahMode(user, userSender, chat_id, msg):
+    response = {
+        "r": {
+            "a": u'CAADAQAD4wEAAiRSnAABw89QHc6ZT7sC',
+            "at": AnswerType.STICKER
+        },
+        "needWait":  COMMANDS["/allahmode"][WAIT]
+    }
+
+    return response
 # definicion de comandos
 COMMANDS = {
     "/hell":{
@@ -347,6 +386,18 @@ COMMANDS = {
     "/voteanswer": {
         FUNC: proposalStartVoting,
         DESC: u"Te mostrara una propuesta de respuesta y esperara tu votacion usando: {} o {}".format(emLike, emDislike),
+        PARAMS: "",
+        WAIT: False
+    },
+    "/customanswer": {
+        FUNC: addCustomAnswer,
+        DESC: "Agregara una respuesta personalizada. Cuando se cumpla la expresion regular respondera con lo que se le indique mensaje, sticker o gif.",
+        PARAMS: "<ReGex> [mensaje texto]",
+        WAIT: False
+    },
+    "/allahmode": {
+        FUNC: allahMode,
+        DESC: "Activa el modo Allah.",
         PARAMS: "",
         WAIT: False
     }
