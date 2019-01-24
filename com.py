@@ -17,6 +17,7 @@ class AnswerType():
     STICKER = 2
     GIF = 3
     PHOTO = 4
+    BROADCAST = 5
 
 ticketWait = {}
 proposalVoting = {}
@@ -291,12 +292,13 @@ def addCustomAnswer(user, userSender, chat_id, msg):
             "at": AnswerType.TEXT
         },
         "needWait":  COMMANDS["/customanswer"][WAIT]
-    }    
+    }
+
     userSender = msg["from"]["id"]
 
-    if userSender != 10244644:
-        response["r"]["a"] = "Esta opcion es solo para Allah. Para activarlo envia /allahmode"
-        return response
+    # if userSender != 10244644:
+    #     response["r"]["a"] = "Esta opcion es solo para Allah. Para activarlo envia /allahmode"
+    #     return response
 
     tokens = msg["text"].split(" ", 1)
 
@@ -306,7 +308,7 @@ def addCustomAnswer(user, userSender, chat_id, msg):
     
     regex = tokens[1]
 
-    ca.AddForWaiting(regex, userSender)
+    ca.AddForWaiting(chat_id, userSender, regex)
     response["r"]["a"] = "El siguiente mensaje que mandes se tomara como respuesta, puede ser texto, sticker o gif."
     return response
 
@@ -321,6 +323,27 @@ def allahMode(user, userSender, chat_id, msg):
     }
 
     return response
+
+
+def sendBroadcast(user, userSender, chat_id, msg):
+    response = {
+        "r": {
+            "a": u'CAADAQAD4wEAAiRSnAABw89QHc6ZT7sC',
+            "at": AnswerType.TEXT
+        },
+        "needWait":  COMMANDS["/allahmode"][WAIT]
+    }
+    userSender = msg["from"]["id"]
+    if userSender != ca.ALLAH:
+        response["r"]["a"] = "Esta opcion es solo para Allah. Para activar el modo Allah envia: /allahmode"
+        return response
+
+    response["r"]["a"] = dao.GetChatLog()
+    response["r"]["at"] = AnswerType.BROADCAST
+    
+    return response
+        
+
 # definicion de comandos
 COMMANDS = {
     "/hell":{
@@ -398,6 +421,12 @@ COMMANDS = {
     "/allahmode": {
         FUNC: allahMode,
         DESC: "Activa el modo Allah.",
+        PARAMS: "",
+        WAIT: False
+    },
+    "/broadcast": {
+        FUNC: sendBroadcast,
+        DESC: "Envia un mensaje a todos los chats que se han comunicado con el bot.",
         PARAMS: "",
         WAIT: False
     }

@@ -337,9 +337,24 @@ def checkDocuments(msg):
 
     return False
 
+
+def sendBroadCast(msg, chats):
+    currentChat = msg["chat"]["id"]
+    response = "*Broadcast:* `{}`".format(msg["text"].replace("/broadcast", ""))
+    for chat in chats:
+        if currentChat == chat["id"]:
+            continue
+            
+        try:
+            bot.sendMessage(chat_id=chat["id"],text=response, parse_mode="Markdown")
+        except:
+            continue
+
 def on_chat_message(msg):
     if isBot(msg) or isEditing(msg):
         return 
+
+    dao.StoreChatLog(msg["chat"]["id"])
 
     if checkWaitingAnswer(msg):
         return
@@ -442,7 +457,11 @@ def on_chat_message(msg):
         manageResponse(msg, response["r"])
     else:
         response = com.COMMANDS[cmd][com.FUNC](user, userSender, chat_id, msg)
-        manageResponse(msg, response["r"])
+
+        if response["r"]["at"] == com.AnswerType.BROADCAST:
+            sendBroadCast(msg, response["r"]["a"])
+        else:
+            manageResponse(msg, response["r"])
 
         needWait = "needWait" in response and response["needWait"]
         if needWait and userSender != "Tecnologer" and user != "test":

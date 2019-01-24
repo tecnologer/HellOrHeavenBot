@@ -7,6 +7,7 @@ responsesT = db.table('responses')
 proposalsT = db.table('proposals')
 statsT = db.table('stats')
 customAnswerT = db.table('customanswer')
+chatLogT = db.table('chatlog')
 
 q = Query()
 
@@ -36,7 +37,7 @@ def Insert(userdb):
 
 def Update(user, type, user_id=None):
     try:
-        userdb = GetStats(user)
+        userdb = GetStats(user, user_id)
         isnew = False
 
         if userdb == []:
@@ -115,11 +116,12 @@ def UpdateScore(user_id, prop, isUp):
         proposalsT.update(prop, doc_ids=[prop.doc_id])
 
 
-def InsertCustomAnswer(regex, atype, author, answer=None):
+def InsertCustomAnswer(author, regex, atype, answer, chat_id=None):
     newAnswer={
         "regex": regex,
         "type": atype,
         "author": author,
+        "chat_id": chat_id
     }
 
     if not answer is None:
@@ -128,5 +130,25 @@ def InsertCustomAnswer(regex, atype, author, answer=None):
     customAnswerT.insert(newAnswer)
 
 
-def GetCustomAnswer():
-    return customAnswerT.all()
+def GetCustomAnswer(chat_id):
+    return customAnswerT.search( (q.chat_id == chat_id) | (q.chat_id==None))
+
+
+def StoreChatLog(chat_id):
+    try:
+        userdb = GetChatLog(chat_id)
+        if userdb != []:
+            return
+        
+        chatlog = {"id": chat_id}
+        chatLogT.insert(chatlog)
+    except ValueError:
+        print ValueError
+        return False
+
+
+def GetChatLog(chat_id=None):
+    if chat_id is None:
+        return chatLogT.all()
+
+    return chatLogT.search(q.id == chat_id)
