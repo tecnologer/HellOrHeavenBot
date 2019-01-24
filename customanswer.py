@@ -10,7 +10,7 @@ ALLAH_CHAT = 10244644
 WaitingAnswer = {}
 
 
-def AddForWaiting(author, chat_id, regex):
+def AddForWaiting(chat_id, author, regex):
     if not chat_id in WaitingAnswer:
         WaitingAnswer[chat_id] = {}
 
@@ -21,6 +21,8 @@ def AddForWaiting(author, chat_id, regex):
         "answer": None,
         "chat_id": chat_id
     }
+
+    #print WaitingAnswer
 
 def IsWaiting(msg):
     chat_id = msg["chat"]["id"]
@@ -73,7 +75,7 @@ def AddCustomAnswer(chat_id, author, aType, answer):
             "a": None,
             "at": com.AnswerType.TEXT
         },
-        "needWait": False
+        "needWait": True
     }
     try:
         ca = WaitingAnswer[chat_id][author]
@@ -81,9 +83,10 @@ def AddCustomAnswer(chat_id, author, aType, answer):
         dao.InsertCustomAnswer(author, ca["regex"], aType, answer, chat_id)
         response["r"]["a"] = "Listoooo!"
     except:
-        response["r"]["a"] = "Algo no salio como esperaba, intenta de nuevo"
+        response["r"]["a"] = "Algo no salio como esperaba, intenta de nuevo",
+        response["needWait"] = False
     
-    del WaitingAnswer[author]
+    del WaitingAnswer[chat_id][author]
 
     return response
 

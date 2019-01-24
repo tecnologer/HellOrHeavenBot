@@ -340,11 +340,11 @@ def checkDocuments(msg):
 
 def sendBroadCast(msg, chats):
     currentChat = msg["chat"]["id"]
-    response = "*Broadcast:* `{}`".format(msg["text"].replace("/broadcast", ""))
+    response = "*Broadcast:* {}".format(msg["text"].replace("/broadcast", ""))
     for chat in chats:
         if currentChat == chat["id"]:
             continue
-            
+
         try:
             bot.sendMessage(chat_id=chat["id"],text=response, parse_mode="Markdown")
         except:
