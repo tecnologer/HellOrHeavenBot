@@ -79,8 +79,8 @@ def AddCustomAnswer(chat_id, author, aType, answer):
     }
     try:
         ca = WaitingAnswer[chat_id][author]
-        chat_id = None if author == ALLAH and chat_id == ALLAH_CHAT else chat_id
-        dao.InsertCustomAnswer(author, ca["regex"], aType, answer, chat_id)
+        chatid = None if author == ALLAH and chat_id == ALLAH_CHAT else chat_id
+        dao.InsertCustomAnswer(author, ca["regex"], aType, answer, chatid)
         response["r"]["a"] = "Listoooo!"
     except:
         response["r"]["a"] = "Algo no salio como esperaba, intenta de nuevo",

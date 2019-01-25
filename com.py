@@ -202,7 +202,7 @@ def Wait(chat_id, user_id, type):
     ticketWait[chat_id] = {user_id: type}
 
 
-def showAlias(comando, userSender, chat_id):
+def showAlias(user, userSender, chat_id, msg):
     response = {
         "r": {
             "a": None,
@@ -210,6 +210,9 @@ def showAlias(comando, userSender, chat_id):
         },
         "needWait":  COMMANDS["/alias"][WAIT]
     }
+    
+    comando = msg["text"].replace("/alias", "", 1).strip()
+
     if comando == "":
         response["r"]["a"] = u'que raro que tu... lee el manual! (¬_¬)'
         return response
@@ -224,7 +227,7 @@ def showAlias(comando, userSender, chat_id):
     return response
 
 
-def stop(comando, userSender, chat_id):
+def stop(user, userSender, chat_id, msg):
     return {
         "r": dao.GetAnswer(dao.STOP),
         "needWait":  COMMANDS["/stop"][WAIT]
@@ -296,9 +299,10 @@ def addCustomAnswer(user, userSender, chat_id, msg):
 
     userSender = msg["from"]["id"]
 
-    # if userSender != 10244644:
-    #     response["r"]["a"] = "Esta opcion es solo para Allah. Para activarlo envia /allahmode"
-    #     return response
+    if userSender == 17760842:
+        response["r"]["a"] = "No!, tu vete a la pifu."
+        response["needWait"] = True
+        return response
 
     tokens = msg["text"].split(" ", 1)
 
@@ -427,6 +431,12 @@ COMMANDS = {
     "/broadcast": {
         FUNC: sendBroadcast,
         DESC: "Envia un mensaje a todos los chats que se han comunicado con el bot.",
+        PARAMS: "",
+        WAIT: False
+    },
+    "/direct": {
+        # FUNC: sendDirectMsg,
+        DESC: "Envia un mensaje a directo a un chat.",
         PARAMS: "",
         WAIT: False
     }

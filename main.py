@@ -340,7 +340,10 @@ def checkDocuments(msg):
 
 def sendBroadCast(msg, chats):
     currentChat = msg["chat"]["id"]
-    response = "*Broadcast:* {}".format(msg["text"].replace("/broadcast", ""))
+    message = msg["text"].replace("/broadcast", "").strip()
+    if len(message) < 3:
+        return
+    response = "*Broadcast:* {}".format(message)
     for chat in chats:
         if currentChat == chat["id"]:
             continue
@@ -349,6 +352,15 @@ def sendBroadCast(msg, chats):
             bot.sendMessage(chat_id=chat["id"],text=response, parse_mode="Markdown")
         except:
             continue
+
+
+def sendDirectMessage(msg):
+    txt = msg["text"].replace("/direct ", "").split(" ", 1)
+    if len(txt) != 2:
+        return
+    chat_id = txt[0]
+    response = txt[1]
+    bot.sendMessage(chat_id=chat_id, text=response, parse_mode="Markdown")
 
 def on_chat_message(msg):
     if isBot(msg) or isEditing(msg):
@@ -452,6 +464,8 @@ def on_chat_message(msg):
     
     if cmd.startswith("/addanswer"):
         addAnswer(msg)
+    elif cmd.startswith("/direct"):
+        sendDirectMessage(msg)
     elif cmd.startswith("/voteanswer"):
         response = com.proposalStartVoting(msg)
         manageResponse(msg, response["r"])
