@@ -355,6 +355,13 @@ def sendBroadCast(msg, chats):
 
 
 def sendDirectMessage(msg):
+    userSender = msg["from"]["id"]
+    chat_id = msg["chat"]["id"]
+    if userSender != ca.ALLAH:
+        response = "Esta opcion es solo para Allah. Para activar el modo Allah envia: /allahmode"
+        bot.sendMessage(chat_id=chat_id, text=response)
+        return 
+
     txt = msg["text"].replace("/direct ", "").split(" ", 1)
     if len(txt) != 2:
         return
@@ -366,7 +373,7 @@ def on_chat_message(msg):
     if isBot(msg) or isEditing(msg):
         return 
 
-    dao.StoreChatLog(msg["chat"]["id"])
+    dao.StoreChatLog(msg)
 
     if checkWaitingAnswer(msg):
         return
@@ -456,11 +463,7 @@ def on_chat_message(msg):
 
     if user.upper() == 'HELLORHEAVENBOT':
         reply(msg, 'si tu, voy corriendo!')
-        return 
-
-    if user.upper() == userSender.upper():
-        reply(msg, u'solo dios puede juzgarte... nah!, los demas lo haran \U0001f602')
-        return
+        return     
     
     if cmd.startswith("/addanswer"):
         addAnswer(msg)

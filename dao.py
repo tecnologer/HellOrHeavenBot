@@ -134,10 +134,24 @@ def GetCustomAnswer(chat_id):
     return customAnswerT.search( (q.chat_id == chat_id) | (q.chat_id==None))
 
 
-def StoreChatLog(chat_id):
+def StoreChatLog(msg):
     try:
-        userdb = GetChatLog(chat_id)
-        if userdb != []:
+        chat_id = msg["chat"]["id"]
+        name = ""
+        if msg["chat"]["type"] == "group" or msg["chat"]["type"] == u'supergroup':
+            name = msg["chat"]["title"]
+        else:
+            name = msg["chat"]["first_name"]
+
+
+        chatSaved = GetChatLog(chat_id)
+        if chatSaved != []:
+            if name == "":
+                return
+            chat = chatSaved[0]
+            if not "name" in chat or chat["name"]!= name:
+                chat["name"] = name
+                chatLogT.update(chat, doc_ids=[chat.doc_id])
             return
         
         chatlog = {"id": chat_id}
@@ -147,8 +161,11 @@ def StoreChatLog(chat_id):
         return False
 
 
-def GetChatLog(chat_id=None):
-    if chat_id is None:
+def GetChatLog(chat_id=None, name=None):
+    if chat_id is None and name is None:
         return chatLogT.all()
-
-    return chatLogT.search(q.id == chat_id)
+    if not chat_id is None and name is None:
+        return chatLogT.search(q.id == chat_id)
+    if chat_id is None and not name is None:
+        return chatLogT.search(q.name.matches(name, flags=re.IGNORECASE))
+    return chatLogT.search((q.id == chat_id) | (q.name.matches(name, flags=re.IGNORECASE)))

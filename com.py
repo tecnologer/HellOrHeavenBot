@@ -42,6 +42,10 @@ def goToHell(user, userSender, chat_id, msg):
         "needWait": COMMANDS["/hell"][WAIT]
     }
 
+    if user.upper() == userSender.upper():
+        response["r"]["a"] =  u'solo dios puede juzgarte... nah!, los demas lo haran \U0001f602'
+        return response
+
     if user == '':
         response["r"] = getMsgLeeMan()
         response["needWait"] = False
@@ -61,6 +65,10 @@ def goToHeaven(user, userSender, chat_id, msg):
         },
         "needWait": COMMANDS["/heaven"][WAIT]
     }
+
+    if user.upper() == userSender.upper():
+        response["r"]["a"] = u'solo dios puede juzgarte... nah!, los demas lo haran \U0001f602'
+        return response
 
     if user == '':
         response["r"] = getMsgLeeMan()
@@ -348,6 +356,25 @@ def sendBroadcast(user, userSender, chat_id, msg):
     return response
         
 
+def getChatId(user, userSender, chat_id, msg):
+    response = {
+        "r": {
+            "a": u'CAADAQAD4wEAAiRSnAABw89QHc6ZT7sC',
+            "at": AnswerType.TEXT
+        },
+        "needWait":  COMMANDS["/getchatid"][WAIT]
+    }
+
+    userSender = msg["from"]["id"]
+    if userSender != ca.ALLAH:
+        response["r"]["a"] = "Esta opcion es solo para Allah. Para activar el modo Allah envia: /allahmode"
+        return response
+    name = msg["text"].replace("/getchatid ", "")
+    chats = dao.GetChatLog(None,name)
+    
+    response["r"]["a"] = chats if len(chats) > 0 else "No se encontro ningun chat con ese nombre"
+    return response
+    
 # definicion de comandos
 COMMANDS = {
     "/hell":{
@@ -437,6 +464,12 @@ COMMANDS = {
     "/direct": {
         # FUNC: sendDirectMsg,
         DESC: "Envia un mensaje a directo a un chat.",
+        PARAMS: "",
+        WAIT: False
+    },
+    "/getchatid": {
+        FUNC: getChatId,
+        DESC: "Retorna el id del chat en base a un nombre.",
         PARAMS: "",
         WAIT: False
     }
