@@ -398,7 +398,7 @@ def getPing(user, userSender, chat_id, msg):
     }
 
     if startTime is not None:
-        response["r"]["a"] = "Activo desde hace {}".format(
+        response["r"]["a"] = u"Estoy trabajando desde hace {}, pobre de mi \U0001f614".format(
             datetime.datetime.now() - startTime)
     return response
 
