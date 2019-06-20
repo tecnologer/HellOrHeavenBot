@@ -20,11 +20,11 @@ bot = telepot.Bot(key.BOT_KEY)  # token
 timeout = {}
 answerTransactions = {}
 
-#emojis
+# emojis
 emLike = u'\U0001f44d'
 emDislike = u'\U0001f44e'
 
-#stickers
+# stickers
 tranquiloviejo = u"CAADAQADNwADzxSlAAEpVbCJbOTMsAI"
 awanta = u'CAADAQADqwADJaHuBMhw3ty2zbpjAg'
 dejesedemamadas = u'CAADAQAD7wEAAs8UpQABdurS64LRGooC'
@@ -63,6 +63,7 @@ vanndame_dancing2 = u'CgADAwADAQADmEhBTBW3PNcv7nfcAg'
 def handle(msg):
     pprint(msg)
 
+
 def getUserSender(msg):
     if 'username' in msg['from']:
         return msg['from']['username']
@@ -73,20 +74,22 @@ def getUserSender(msg):
 def isBot(msg):
     return 'from' in msg and 'is_bot' in msg['from'] and msg['from']['is_bot']
 
+
 def reply(msg, response, replyTo=True):
     chat_id = msg['chat']['id']
     msgId = msg['message_id']
     if not replyTo:
         msgId = None
 
-    bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msgId )
+    bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msgId)
 
 
-def replyDocument(msg, docid, replyTo = True):
+def replyDocument(msg, docid, replyTo=True):
     chat_id = msg['chat']['id']
     msgId = replyTo if msg['message_id'] else None
 
-    bot.sendDocument(chat_id=chat_id, document=docid, reply_to_message_id=msgId)
+    bot.sendDocument(chat_id=chat_id, document=docid,
+                     reply_to_message_id=msgId)
 
 
 def responseDocument(msg, docid, caption=None):
@@ -99,16 +102,18 @@ def responseImage(msg, photo, caption=None):
     photo = os.path.join(dirname, photo)
     bot.sendPhoto(chat_id, open(photo, 'rb'), caption)
 
+
 def replySticker(msg, sticker, reply=True):
     try:
         chat_id = msg['chat']['id']
         msgId = msg['message_id']
         if not reply:
             msgId = None
-        bot.sendSticker(chat_id=chat_id, sticker=sticker, reply_to_message_id=msgId)
+        bot.sendSticker(chat_id=chat_id, sticker=sticker,
+                        reply_to_message_id=msgId)
     except:
         print("error al enviar sticker: ", sticker)
-    
+
 
 def getAwnser(type):
     return dao.GetAnswer(type)
@@ -116,6 +121,7 @@ def getAwnser(type):
 
 def newRecord(sender):
     timeout[sender] = {"time": time.time(), "count": 0}
+
 
 def wait(msg, type):
     sender = getUserSender(msg)
@@ -127,6 +133,7 @@ def wait(msg, type):
 
     com.Wait(chat_id, user_id, type)
 
+
 def validTimeout(msg, sender):
     if not sender in timeout:
         return True
@@ -134,7 +141,7 @@ def validTimeout(msg, sender):
     elapsed = int(time.time()-timeout[sender]["time"])
 
     if elapsed <= 30:
-        timeout[sender]["count"]+=1
+        timeout[sender]["count"] += 1
 
         if timeout[sender]["count"] == 1:
             replySticker(msg, tranquiloviejo)
@@ -169,13 +176,14 @@ def checkSpecialWords(msg):
     #     replySticker(msg, ora_bergha, False)
     if textMatch(iscoraline, msg['text']) and msg["from"]["id"] == 17760842:
         reply(msg, "si seras, si seras, que se llama Karelia, che terco!")
-    
+
 
 def textMatch(regex, test_str):
     matches = re.search(
         regex, test_str, re.MULTILINE | re.UNICODE | re.IGNORECASE)
 
     return matches is not None
+
 
 def manageResponse(msg, response):
     answer = response["a"]
@@ -189,7 +197,7 @@ def manageResponse(msg, response):
         responseImage(msg, answer)
     else:  # answerype == com.Answerype.TEXT:
         reply(msg, answer)
-    
+
     if not "file_id" in response and not "file_t" in response:
         return
 
@@ -201,12 +209,13 @@ def manageResponse(msg, response):
         responseImage(msg, response["file_id"])
 
 
-
 def waitForAnswer(chat_id, user_id, tipo):
     answerTransactions[chat_id] = {user_id: tipo}
 
+
 def isWaitingAnswer(chat_id, user_id):
     return chat_id in answerTransactions and user_id in answerTransactions[chat_id]
+
 
 def checkWaitingAnswer(msg):
     chat_id = msg['chat']['id']
@@ -234,13 +243,13 @@ def checkWaitingAnswer(msg):
     elif "animation" in msg:
         answer = msg["animation"]['file_id']
         answerType = com.AnswerType.GIF
-    
+
     if answerType == -1:
         del answerTransactions[chat_id][user_id]
         replySticker(msg, dejesedemamadas)
         reply(msg, "Solo texto, sticker o gif. Ahora por vivo, tienes que volver a empezar", False)
         return True
-    
+
     answerObj = {
         "t": answerTransactions[chat_id][user_id],
         "a": answer,
@@ -255,17 +264,18 @@ def checkWaitingAnswer(msg):
     del answerTransactions[chat_id][user_id]
     return True
 
+
 def addAnswer(msg):
     chat_id = msg['chat']['id']
     user_id = msg["from"]['id']
     tokens = msg["text"].split(" ", 2)
-    
-    #solo comando
+
+    # solo comando
     if len(tokens) < 2:
         reply(
             msg, "Es necesario especificar el tipo. /addanswer {}".format(com.COMMANDS["/addanswer"][com.PARAMS]))
         return
-        
+
     tipo = tokens[1]
 
     if not tipo.isdigit():
@@ -279,13 +289,13 @@ def addAnswer(msg):
             msg, "Tipo solo puede tomar valor de:\n1.- Hell\n2.- Heaven\n3.- Cancel")
         return
 
-    #solo comando y tipo
+    # solo comando y tipo
     if len(tokens) == 2:
         waitForAnswer(chat_id, user_id, tipo)
         reply(
             msg, "Manda lo que quieras que responda. Puede ser un mensaje de texto, sticker o gif.")
         return
-    
+
     answer = tokens[2].strip()
     answerObj = {
         "t": tipo,
@@ -310,22 +320,24 @@ def AddVotation(msg):
     del com.proposalVoting[user_id]
     replySticker(msg, gatolike, False)
 
+
 def isEditing(msg):
     return "edit_date" in msg
+
 
 def checkDocuments(msg):
     if not "document" in msg or not "file_id" in msg["document"]:
         return False
     docId = msg["document"]["file_id"]
-    
+
     if docId == trabajaperro_gif:
         reply(msg, "trabaja, perro!", False)
         return True
-    
+
     if docId == vanndame_dancing1 or docId == vanndame_dancing2:
         replyDocument(msg, vanndame_street)
         return True
-    
+
     if docId == vanndame_street:
         r = random.randint(1, 2)
         if r == 1:
@@ -349,7 +361,8 @@ def sendBroadCast(msg, chats):
             continue
 
         try:
-            bot.sendMessage(chat_id=chat["id"],text=response, parse_mode="Markdown")
+            bot.sendMessage(chat_id=chat["id"],
+                            text=response, parse_mode="Markdown")
         except:
             continue
 
@@ -360,7 +373,7 @@ def sendDirectMessage(msg):
     if userSender != ca.ALLAH:
         response = "Esta opcion es solo para Allah. Para activar el modo Allah envia: /allahmode"
         bot.sendMessage(chat_id=chat_id, text=response)
-        return 
+        return
 
     txt = msg["text"].replace("/direct ", "").split(" ", 1)
     if len(txt) != 2:
@@ -369,15 +382,16 @@ def sendDirectMessage(msg):
     response = txt[1]
     bot.sendMessage(chat_id=chat_id, text=response, parse_mode="Markdown")
 
+
 def on_chat_message(msg):
     if isBot(msg) or isEditing(msg):
-        return 
+        return
 
     dao.StoreChatLog(msg)
 
     if checkWaitingAnswer(msg):
         return
-    
+
     if ca.IsWaiting(msg):
         response = ca.ValidateMsg(msg)
         if "r" in response:
@@ -386,8 +400,8 @@ def on_chat_message(msg):
 
     if IsVatotation(msg):
         AddVotation(msg)
-        return 
-    #u'file_id' (140128345684368):u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
+        return
+    # u'file_id' (140128345684368):u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
 
     if checkDocuments(msg):
         return
@@ -395,7 +409,6 @@ def on_chat_message(msg):
     # if not has text or sticker
     if (not 'text' in msg and not 'sticker' in msg):
         return
-    
 
     cmd = ''
     user = ''
@@ -413,7 +426,7 @@ def on_chat_message(msg):
 
         if user.startswith("/cancel"):
             manageResponse(msg, com.cancel("", "", chat_id, msg)["r"])
-            return 
+            return
         ignoreTimeout = True
         cmd = com.GetWaitingCmd(chat_id, user_id)
         com.cancel("", "", chat_id, msg)
@@ -422,12 +435,12 @@ def on_chat_message(msg):
         response = ''
         if len(cmds) >= 2:
             cmd = cmds[0]
-            user = cmds[1].replace('@', '')        
+            user = cmds[1].replace('@', '')
         elif len(cmds) == 1:
             cmd = cmds[0]
-    elif 'sticker' in msg and msg['sticker']['file_id']==ticketHell:
+    elif 'sticker' in msg and msg['sticker']['file_id'] == ticketHell:
         if not validTimeout(msg, userSender):
-            return        
+            return
         wait(msg, dao.HELL)
         return
     elif 'sticker' in msg and msg['sticker']['file_id'] == ticketHeaven:
@@ -463,8 +476,8 @@ def on_chat_message(msg):
 
     if user.upper() == 'HELLORHEAVENBOT':
         reply(msg, 'si tu, voy corriendo!')
-        return     
-    
+        return
+
     if cmd.startswith("/addanswer"):
         addAnswer(msg)
     elif cmd.startswith("/direct"):
@@ -483,7 +496,7 @@ def on_chat_message(msg):
         needWait = "needWait" in response and response["needWait"]
         if needWait and userSender != "Tecnologer" and user != "test":
             newRecord(userSender)
-        
+
 
 bot.message_loop({'chat': on_chat_message})
 
