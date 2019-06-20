@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+import datetime
 import dao
 import customanswer as ca
 
@@ -11,6 +11,8 @@ WAIT = "needWait"
 
 emLike = u'\U0001f44d'
 emDislike = u'\U0001f44e'
+startTime = datetime.datetime.now()
+
 
 class AnswerType():
     TEXT = 1
@@ -19,15 +21,18 @@ class AnswerType():
     PHOTO = 4
     BROADCAST = 5
 
+
 ticketWait = {}
 proposalVoting = {}
+
 
 def getUserId(msg):
     user_id = None
     if "from" in msg and "id" in msg["from"]:
         user_id = msg["from"]["id"]
-    
+
     return user_id
+
 
 def getMsgLeeMan():
     return {"a": 'que raro que tu... lee el manual!', "at": AnswerType.TEXT}
@@ -43,13 +48,13 @@ def goToHell(user, userSender, chat_id, msg):
     }
 
     if user.upper() == userSender.upper():
-        response["r"]["a"] =  u'solo dios puede juzgarte... nah!, los demas lo haran \U0001f602'
+        response["r"]["a"] = u'solo dios puede juzgarte... nah!, los demas lo haran \U0001f602'
         return response
 
     if user == '':
         response["r"] = getMsgLeeMan()
         response["needWait"] = False
-        return response 
+        return response
 
     if user != "test":
         dao.Update(user, dao.HELL)
@@ -75,11 +80,11 @@ def goToHeaven(user, userSender, chat_id, msg):
         response["needWait"] = False
         return response
 
-
     if user != "test":
         dao.Update(user, dao.HEAVEN)
     response["r"] = dao.GetAnswer(dao.HEAVEN)
     return response
+
 
 def getStats(user, userSender, chat_id, msg):
     response = {
@@ -96,7 +101,7 @@ def getStats(user, userSender, chat_id, msg):
         dao.Update(userSender, None, user_id)
 
     stats = dao.GetStats(userSender, user_id)
-    
+
     if stats != []:
         hell = stats[0]['hell']
         heaven = stats[0]['heaven']
@@ -104,10 +109,12 @@ def getStats(user, userSender, chat_id, msg):
 
         if heaven > hell:
             emoji = u'\u271d\ufe0f'
-        response["r"]["a"] = 'Heaven: {}, Hell: {} ... {}'.format(heaven, hell, emoji)
+        response["r"]["a"] = 'Heaven: {}, Hell: {} ... {}'.format(
+            heaven, hell, emoji)
         return response
 
-    response["r"]["a"] = '{} la estadisticas no importan, vas al infierno de cualquier manera.'.format(userSender)
+    response["r"]["a"] = '{} la estadisticas no importan, vas al infierno de cualquier manera.'.format(
+        userSender)
     return response
 
 
@@ -127,7 +134,7 @@ def getAllStats(user, userSender, chat_id, msg):
 
     if len(stats) == 0:
         response["r"]["a"] = "no hay nada"
-        response["needWait"]= False
+        response["needWait"] = False
         return response
 
     res = ""
@@ -142,7 +149,7 @@ def getAllStats(user, userSender, chat_id, msg):
 
         res += '- {} -> Heaven: {}, Hell: {} ... {}\n'.format(
             val["user"],  heaven, hell, emoji)
-    
+
     response["r"]["a"] = res
     return response
 
@@ -158,7 +165,7 @@ def cancel(user, userSender, chat_id, msg):
     if not chat_id in ticketWait:
         response["r"]["a"] = "que vas a cancelar, no tienes nada"
         return response
-        
+
     del ticketWait[chat_id]
     response["r"] = dao.GetAnswer(dao.CANCEL)
     return response
@@ -174,8 +181,9 @@ def showHelp(user, userSender, chat_id, msg):
     }
     res = "Bot para telegram que registra las acciones buenas y malas de los usuarios.\n\n"
     for k, v in COMMANDS.iteritems():
-        res += "- {} {}{}=> {}\n".format(k, v[PARAMS], "" if v[PARAMS]=="" else " ", v[DESC])
-    
+        res += "- {} {}{}=> {}\n".format(k, v[PARAMS],
+                                         "" if v[PARAMS] == "" else " ", v[DESC])
+
     response["r"]["a"] = res
     return response
 
@@ -193,18 +201,21 @@ def resetData(user, userSender, chat_id, msg):
 
     return response
 
+
 def VerifyAlias(cmd):
     if cmd in alias:
         return alias[cmd]
-    
+
     return ""
 
 
 def IsWaiting(chat_id, user_id):
     return chat_id in ticketWait and user_id in ticketWait[chat_id]
 
+
 def GetWaitingCmd(chat_id, user_id):
     return "/hell" if ticketWait[chat_id][user_id] == dao.HELL else "/heaven"
+
 
 def Wait(chat_id, user_id, type):
     ticketWait[chat_id] = {user_id: type}
@@ -218,7 +229,7 @@ def showAlias(user, userSender, chat_id, msg):
         },
         "needWait":  COMMANDS["/alias"][WAIT]
     }
-    
+
     comando = msg["text"].replace("/alias", "", 1).strip()
 
     if comando == "":
@@ -230,7 +241,6 @@ def showAlias(user, userSender, chat_id, msg):
         if v == comando:
             res += "- {}\n".format(k)
 
-
     response["r"]["a"] = res
     return response
 
@@ -240,6 +250,7 @@ def stop(user, userSender, chat_id, msg):
         "r": dao.GetAnswer(dao.STOP),
         "needWait":  COMMANDS["/stop"][WAIT]
     }
+
 
 def proposalStartVoting(msg, *args):
     response = {
@@ -268,7 +279,7 @@ def proposalStartVoting(msg, *args):
         _for = "/hell"
     elif prop["proposal"]["t"] == dao.CANCEL:
         _for = "/cancel"
-    
+
     help = "Usa {} para darle un punto a favor, o {} para darle un punto en contra. Si llega a {} puntos a favor se usara como respuesta.".format(
         emLike, emDislike, dao.MAXVOTES)
     r = {"a": "", "at": AnswerType.TEXT}
@@ -317,7 +328,7 @@ def addCustomAnswer(user, userSender, chat_id, msg):
     if len(tokens) < 2:
         response["r"]["a"] = "La expresion regular es necesaria. /customanswer <regex> [mensaje]"
         return response
-    
+
     regex = tokens[1]
 
     ca.AddForWaiting(chat_id, userSender, regex)
@@ -352,9 +363,9 @@ def sendBroadcast(user, userSender, chat_id, msg):
 
     response["r"]["a"] = dao.GetChatLog()
     response["r"]["at"] = AnswerType.BROADCAST
-    
+
     return response
-        
+
 
 def getChatId(user, userSender, chat_id, msg):
     response = {
@@ -370,19 +381,36 @@ def getChatId(user, userSender, chat_id, msg):
         response["r"]["a"] = "Esta opcion es solo para Allah. Para activar el modo Allah envia: /allahmode"
         return response
     name = msg["text"].replace("/getchatid ", "")
-    chats = dao.GetChatLog(None,name)
-    
-    response["r"]["a"] = chats if len(chats) > 0 else "No se encontro ningun chat con ese nombre"
+    chats = dao.GetChatLog(None, name)
+
+    response["r"]["a"] = chats if len(
+        chats) > 0 else "No se encontro ningun chat con ese nombre"
     return response
-    
+
+
+def getPing(user, userSender, chat_id, msg):
+    response = {
+        "r": {
+            "a": u'No se de que hablas',
+            "at": AnswerType.TEXT
+        },
+        "needWait":  COMMANDS["/ping"][WAIT]
+    }
+
+    if startTime is not None:
+        response["r"]["a"] = "Activo desde hace {}".format(
+            datetime.datetime.now() - startTime)
+    return response
+
+
 # definicion de comandos
 COMMANDS = {
-    "/hell":{
+    "/hell": {
         FUNC: goToHell,
         DESC: "Se agrega al usuario un boleto al infierno",
         PARAMS: "<username>",
         WAIT: True
-    }, 
+    },
     "/heaven": {
         FUNC: goToHeaven,
         DESC: "Se agrega al usuario un boleto al cielo",
@@ -419,7 +447,7 @@ COMMANDS = {
         PARAMS: "",
         WAIT: False
     },
-    "/alias":{
+    "/alias": {
         FUNC: showAlias,
         DESC: "Muestra el alias para el comando elegido",
         PARAMS: "</comando>",
@@ -470,6 +498,12 @@ COMMANDS = {
     "/getchatid": {
         FUNC: getChatId,
         DESC: "Retorna el id del chat en base a un nombre.",
+        PARAMS: "",
+        WAIT: False
+    },
+    "/ping": {
+        FUNC: getPing,
+        DESC: "Retorna el tiempo que ha pasado desde que se ejecuto.",
         PARAMS: "",
         WAIT: False
     }
