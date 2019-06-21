@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 import dao
+import re
 import customanswer as ca
 
 DESC = "desc"
@@ -326,12 +327,19 @@ def addCustomAnswer(user, userSender, chat_id, msg):
     tokens = msg["text"].split(" ", 1)
 
     if len(tokens) < 2:
-        response["r"]["a"] = "La expresion regular es necesaria. /customanswer <regex> [mensaje]"
+        response["r"]["a"] = "La expresion regular es necesaria. `/customanswer <regex> [mensaje]`"
         return response
 
-    regex = tokens[1]
+    regexStr = tokens[1]
 
-    ca.AddForWaiting(chat_id, userSender, regex)
+    try:
+        re.compile(regexStr, re.MULTILINE | re.UNICODE | re.IGNORECASE)
+    except re.error as error:
+        response["r"]["a"] = "_La expresion no es invalida_. *Error* -> `{}`".format(
+            error)
+        return response
+
+    ca.AddForWaiting(chat_id, userSender, regexStr)
     response["r"]["a"] = "El siguiente mensaje que mandes se tomara como respuesta, puede ser texto, sticker o gif."
     return response
 
