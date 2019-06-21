@@ -24,6 +24,7 @@ def AddForWaiting(chat_id, author, regex):
 
     #print WaitingAnswer
 
+
 def IsWaiting(msg):
     chat_id = msg["chat"]["id"]
     author = msg["from"]["id"]
@@ -65,7 +66,7 @@ def ValidateMsg(msg):
             "at": com.AnswerType.STICKER
         }
         return response
-    
+
     return AddCustomAnswer(chat_id, author, answerType, answer)
 
 
@@ -85,7 +86,7 @@ def AddCustomAnswer(chat_id, author, aType, answer):
     except:
         response["r"]["a"] = "Algo no salio como esperaba, intenta de nuevo",
         response["needWait"] = False
-    
+
     del WaitingAnswer[chat_id][author]
 
     return response
@@ -97,8 +98,12 @@ def ValidateCustomAnswer(msg):
     text = msg["text"]
     matches = []
     for result in results:
-        regex = re.compile(
-            result["regex"], re.MULTILINE | re.UNICODE | re.IGNORECASE)
+        try:
+            regex = re.compile(
+                result["regex"], re.MULTILINE | re.UNICODE | re.IGNORECASE)
+        except:
+            print "error with `{}`".format(result["regex"])
+            continue
 
         if textMatch(regex, text):
             matches.append({
@@ -117,6 +122,7 @@ def ValidateCustomAnswer(msg):
     i = random.randint(0, len(matches)-1)
 
     return matches[i]
+
 
 def textMatch(regex, test_str):
     matches = re.search(
