@@ -81,7 +81,8 @@ def reply(msg, response, replyTo=True):
     if not replyTo:
         msgId = None
 
-    bot.sendMessage(chat_id=chat_id, text=response, reply_to_message_id=msgId)
+    bot.sendMessage(chat_id=chat_id, text=response,
+                    reply_to_message_id=msgId, parse_mode="Markdown")
 
 
 def replyDocument(msg, docid, replyTo=True):
