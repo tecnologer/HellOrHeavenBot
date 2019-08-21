@@ -31,6 +31,39 @@ Bot para telegram que registra las acciones buenas y malas de los usuarios.
 - [TinyDb][2]: `pip install tinydb`
 - [telepot][3]: `pip install telepot`
 
+### Ejecutar con Docker
+
+Require docker instalado y configurado en variables de entorno.
+
+1. `docker build .` => esto arrojara un id al finalizar el proceso
+
+   ```
+   > docker build .
+   Sending build context to Docker daemon  414.2kB
+   Step 1/5 : FROM python:2
+   ---> d75b4eed9ada
+   Step 2/5 : RUN pip install tinydb
+   ---> Using cache
+   ---> b4b987febb7a
+   Step 3/5 : RUN pip install telepot
+   ---> Using cache
+   ---> cdeba640ee41
+   Step 4/5 : ADD . /
+   ---> faa785f24bcf
+   Step 5/5 : CMD ["python","-u", "/main.py"]
+   ---> Running in 97ae0e70909b
+   Removing intermediate container 97ae0e70909b
+   ---> c6f3704701a8
+   Successfully built c6f3704701a8
+   ```
+
+2. `docker run <build_id>`
+
+   ```
+   > docker run c6f3704701a8
+   Listening ...
+   ```
+
 Pruebalo: [t.me/hellorheavenbot][1]
 
 [1]: https://t.me/hellorheavenbot
