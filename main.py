@@ -52,12 +52,12 @@ mcdinero_gif = u'CgADAQADAQADLm_4TFkwvxivN4ncAg'
 hagaaay_gif = u'CgADAwADAQADhjxQTo1Kz-gOAQ_jAg'
 ikillu_gif = u'CgADBAADFaAAAloXZAe9o2B4i9CciwI'
 racists_gif = u'CgADBAADwKMAAlEXZAcPm6zqHWX1DAI'
-trabajaperro_gif = u'CgADBAADeRcAAsUdZAefc7VUnBenbwI'
+trabajaperro_gif = u'CgADBAADeRcAAsUdZAefc7VUnBenbxYE'
 maradona_gif = u'CgADBAAD758AAvgaZAfNzwLnrluCJAI'
 carlton_gif = u'CgADBAADcZ8AAmgXZAfrrj1C3Ln98gI'
-vanndame_street = u'CgADAwADBwADpFcITFLjOjfn8IfZAg'
-vanndame_dancing1 = u'CgADBAADxY8AAlsdZAcjIh--PzkbtwI'
-vanndame_dancing2 = u'CgADAwADAQADmEhBTBW3PNcv7nfcAg'
+vanndame_street = u'CgADAwADBwADpFcITFLjOjfn8IfZFgQ'
+vanndame_dancing1 = u'CgADBAADxY8AAlsdZAcjIh--PzkbtxYE'
+vanndame_dancing2 = u'CgADAwADAQADmEhBTBW3PNcv7nfcFgQ'
 
 
 def handle(msg):
