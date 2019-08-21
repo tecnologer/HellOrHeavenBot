@@ -20,6 +20,8 @@ bot = telepot.Bot(key.BOT_KEY)  # token
 timeout = {}
 answerTransactions = {}
 
+botId = 684372282
+
 # emojis
 emLike = u'\U0001f44d'
 emDislike = u'\U0001f44e'
@@ -384,6 +386,10 @@ def sendDirectMessage(msg):
     bot.sendMessage(chat_id=chat_id, text=response, parse_mode="Markdown")
 
 
+def isReplying(msg):
+    return u'reply_to_message' in msg and "from" in msg["reply_to_message"] and "id" in msg["reply_to_message"]["from"] and msg["reply_to_message"]["from"]["id"] == botId
+
+
 def on_chat_message(msg):
     if isBot(msg) or isEditing(msg):
         return
@@ -458,6 +464,9 @@ def on_chat_message(msg):
 
     if not cmd.startswith('/') and not 'sticker' in msg:
         checkSpecialWords(msg)
+        if isReplying(msg):
+            msg["text"] = "bot"
+            checkSpecialWords(msg)
         return
 
     # acept commands type /command@HellOrHeavenBot
