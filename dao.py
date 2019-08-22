@@ -11,7 +11,7 @@ chatLogT = db.table('chatlog')
 
 q = Query()
 
-#types
+# types
 HELL = 1
 HEAVEN = 2
 CANCEL = 3
@@ -20,6 +20,7 @@ STOP = 5
 
 MAXVOTES = 3
 
+
 def GetAllStats():
     return statsT.all()
 
@@ -27,13 +28,15 @@ def GetAllStats():
 def GetStats(user, user_id=None):
     if not user_id is None:
         return statsT.search((q.user_id == user_id) | (q.user == user))
-    
+
     return statsT.search(q.user == user)
     # user = "^{}$".format(user)
     # return statsT.search(q.user.matches(user, flags=re.IGNORECASE))
 
+
 def Insert(userdb):
     statsT.insert(userdb)
+
 
 def Update(user, type, user_id=None):
     try:
@@ -55,13 +58,13 @@ def Update(user, type, user_id=None):
             userdb['heaven'] += 1
 
         if isnew:
-           Insert(userdb)
+            Insert(userdb)
         else:
             statsT.update(userdb, doc_ids=[userdb.doc_id])
 
         return True
     except ValueError:
-        print ValueError
+        print(ValueError)
         return False
 
 
@@ -82,6 +85,8 @@ def InsertAnswer(res):
     responsesT.insert(res)
 
 # Region Proposal
+
+
 def InsertProposal(prop):
     record = {
         "proposal": prop,
@@ -91,8 +96,10 @@ def InsertProposal(prop):
     }
     proposalsT.insert(record)
 
-def GetRandomProposal(user_id):    
-    rs = proposalsT.search( (~ q.voters.all([user_id])) & (q.upvote < MAXVOTES) & (q.downvote < MAXVOTES) )
+
+def GetRandomProposal(user_id):
+    rs = proposalsT.search((~ q.voters.all([user_id])) & (
+        q.upvote < MAXVOTES) & (q.downvote < MAXVOTES))
     if len(rs) == 0:
         return None
     elif len(rs) == 1:
@@ -101,12 +108,13 @@ def GetRandomProposal(user_id):
     i = random.randint(0, len(rs)-1)
     return rs[i]
 
+
 def UpdateScore(user_id, prop, isUp):
     if isUp:
         prop["upvote"] += 1
     else:
         prop["downvote"] += 1
-    
+
     prop["voters"].append(user_id)
 
     if prop["upvote"] >= MAXVOTES:
@@ -117,7 +125,7 @@ def UpdateScore(user_id, prop, isUp):
 
 
 def InsertCustomAnswer(author, regex, atype, answer, chat_id=None):
-    newAnswer={
+    newAnswer = {
         "regex": regex,
         "type": atype,
         "author": author,
@@ -131,7 +139,7 @@ def InsertCustomAnswer(author, regex, atype, answer, chat_id=None):
 
 
 def GetCustomAnswer(chat_id):
-    return customAnswerT.search( (q.chat_id == chat_id) | (q.chat_id==None))
+    return customAnswerT.search((q.chat_id == chat_id) | (q.chat_id == None))
 
 
 def StoreChatLog(msg):
@@ -143,21 +151,20 @@ def StoreChatLog(msg):
         else:
             name = msg["chat"]["first_name"]
 
-
         chatSaved = GetChatLog(chat_id)
         if chatSaved != []:
             if name == "":
                 return
             chat = chatSaved[0]
-            if not "name" in chat or chat["name"]!= name:
+            if not "name" in chat or chat["name"] != name:
                 chat["name"] = name
                 chatLogT.update(chat, doc_ids=[chat.doc_id])
             return
-        
+
         chatlog = {"id": chat_id}
         chatLogT.insert(chatlog)
     except ValueError:
-        print ValueError
+        print(ValueError)
         return False
 
 

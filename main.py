@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import telepot
 import sys
 import time
@@ -13,8 +16,8 @@ from pprint import pprint
 
 dirname = os.path.dirname(__file__)
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
 bot = telepot.Bot(key.BOT_KEY)  # token
 
 timeout = {}

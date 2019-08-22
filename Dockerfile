@@ -1,4 +1,4 @@
-FROM python:2
+FROM python
 RUN pip install tinydb
 RUN pip install telepot
 ADD . /

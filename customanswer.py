@@ -102,7 +102,7 @@ def ValidateCustomAnswer(msg):
             regex = re.compile(
                 result["regex"], re.MULTILINE | re.UNICODE | re.IGNORECASE)
         except:
-            print "error with `{}`".format(result["regex"])
+            print("error with `{}`".format(result["regex"]))
             continue
 
         if textMatch(regex, text):
