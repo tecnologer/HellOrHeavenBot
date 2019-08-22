@@ -85,6 +85,8 @@ Require docker instalado y configurado en variables de entorno.
 
 # Telegram bot
 
+Pasos para crear un bot en telegram
+
 - Envia el comando `/newbot` a [BotFather][5]
 - Te solicitara el nombre de tu bot. Ejemplo: MiPrimerBot
 - Despues es necesario asignarle un nombre usuario. Ejemplo: MiPrimerBot (este ya estara en uso, sera necesario seleccionar otro)
