@@ -1,6 +1,24 @@
 # HellOrHeavenBot
 
-Bot para telegram que registra las acciones buenas y malas de los usuarios.
+Bot multifuncion para telegram, soporta una variedad de [comandos](#comandos).
+
+La tarea principal para que fue creado es llevar un contador de boletos al infierno (`/hell`) o al cielo (`/heaven`), estos "boletos" son registrados por otro usuario. Cada usuario puede revisar sus estadisticas con el comando `/stats`.
+
+Adicional a esto se agrego un sistema para que los usuarios pudieran agregar respuestas (`/addanswer`) que el bot usara cuando se asigne un nuevo boleto. Estas respuestas son guardadas en una base de datos tipo JSON ([tinydb][2]), cuando se requiera el bot buscara y eligira una respuesta al azar.
+
+Separado del tema principal, puede reaccionar a palabras que se le envien, para agregar reacciones se usa el comando `/customanswer` el cual necesita una expresion regular, dicha expresion sera evaluada y si el mensaje cumple con ella, enviara la respuesta que se le asigno. Ejemplos:
+
+```
+# si un usuario escribe "hola", el bot respondera con un "hola"
+> /customanswer hola
+> hola
+
+# si le preguntan "como te llamas\?", el responde "me llamo luci"
+> /customanswer como te llamas\?
+> me llamo luci
+```
+
+**Nota:** Cada simbolo `>` indica que es un mensaje diferente.
 
 ## Comandos
 
@@ -28,7 +46,7 @@ Bot para telegram que registra las acciones buenas y malas de los usuarios.
 ## Dependencias y requisitos
 
 - [Crear un bot en telegram](#telegram-bot)
-- [Python 2.7.x][4]
+- [Python 2.7.x][4], para python3 use branch [python3](/tree/python3)
 - [TinyDb][2]: `pip install tinydb`
 - [telepot][3]: `pip install telepot`
 
@@ -66,10 +84,12 @@ Require docker instalado y configurado en variables de entorno.
    ```
 
 # Telegram bot
+
 - Envia el comando `/newbot` a [BotFather][5]
 - Te solicitara el nombre de tu bot. Ejemplo: MiPrimerBot
 - Despues es necesario asignarle un nombre usuario. Ejemplo: MiPrimerBot (este ya estara en uso, sera necesario seleccionar otro)
 - Te enviara un mensaje como este:
+
   ```
   Done! Congratulations on your new bot. You will find it at t.me/MiPrimerBot. You can now add a description, about section and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you do this.
 
@@ -79,6 +99,7 @@ Require docker instalado y configurado en variables de entorno.
 
     For a description of the Bot API, see this page: https://core.telegram.org/bots/api
   ```
+
 - `<BOT_TOKEN>` sera el valor a reemplazar en el archivo `key.py`
 
 Pruebalo: [t.me/hellorheavenbot][1]
