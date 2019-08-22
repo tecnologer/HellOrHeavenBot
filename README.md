@@ -28,7 +28,7 @@ Bot para telegram que registra las acciones buenas y malas de los usuarios.
 ## Dependencias y requisitos
 
 - [Crear un bot en telegram](#telegram-bot)
-- [Python 2.7.x][4]
+- [Python 3.7.x][4]
 - [TinyDb][2]: `pip install tinydb`
 - [telepot][3]: `pip install telepot`
 
@@ -66,10 +66,12 @@ Require docker instalado y configurado en variables de entorno.
    ```
 
 # Telegram bot
+
 - Envia el comando `/newbot` a [BotFather][5]
 - Te solicitara el nombre de tu bot. Ejemplo: MiPrimerBot
 - Despues es necesario asignarle un nombre usuario. Ejemplo: MiPrimerBot (este ya estara en uso, sera necesario seleccionar otro)
 - Te enviara un mensaje como este:
+
   ```
   Done! Congratulations on your new bot. You will find it at t.me/MiPrimerBot. You can now add a description, about section and profile picture for your bot, see /help for a list of commands. By the way, when you've finished creating your cool bot, ping our Bot Support if you want a better username for it. Just make sure the bot is fully operational before you do this.
 
@@ -79,6 +81,7 @@ Require docker instalado y configurado en variables de entorno.
 
     For a description of the Bot API, see this page: https://core.telegram.org/bots/api
   ```
+
 - `<BOT_TOKEN>` sera el valor a reemplazar en el archivo `key.py`
 
 Pruebalo: [t.me/hellorheavenbot][1]
@@ -86,5 +89,5 @@ Pruebalo: [t.me/hellorheavenbot][1]
 [1]: https://t.me/hellorheavenbot
 [2]: https://tinydb.readthedocs.io/en/latest/getting-started.html#installing-tinydb
 [3]: https://telepot.readthedocs.io/en/latest/
-[4]: https://www.python.org/downloads/release/python-278/#download
+[4]: https://www.python.org/downloads/
 [5]: https://t.me/botfather
