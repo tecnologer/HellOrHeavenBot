@@ -482,7 +482,7 @@ COMMANDS = {
     "/customanswer": {
         FUNC: addCustomAnswer,
         DESC: "Agregara una respuesta personalizada. Cuando se cumpla la expresion regular respondera con lo que se le indique mensaje, sticker o gif.",
-        PARAMS: "<ReGex> [mensaje texto]",
+        PARAMS: "<ReGex>",
         WAIT: False
     },
     "/allahmode": {
