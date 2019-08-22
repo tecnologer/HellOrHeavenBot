@@ -46,7 +46,7 @@ Separado del tema principal, puede reaccionar a palabras que se le envien, para 
 ## Dependencias y requisitos
 
 - [Crear un bot en telegram](#telegram-bot)
-- [Python 2.7.x][4], para python3 use branch [python3](/tree/python3)
+- [Python 2.7.x][4], para python3 use branch [python3][6]
 - [TinyDb][2]: `pip install tinydb`
 - [telepot][3]: `pip install telepot`
 
@@ -109,3 +109,4 @@ Pruebalo: [t.me/hellorheavenbot][1]
 [3]: https://telepot.readthedocs.io/en/latest/
 [4]: https://www.python.org/downloads/release/python-278/#download
 [5]: https://t.me/botfather
+[6]: https://github.com/Tecnologer/HellOrHeavenBot/tree/python3
