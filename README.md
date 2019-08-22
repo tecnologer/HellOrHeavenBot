@@ -87,4 +87,4 @@ Pruebalo: [t.me/hellorheavenbot][1]
 [2]: https://tinydb.readthedocs.io/en/latest/getting-started.html#installing-tinydb
 [3]: https://telepot.readthedocs.io/en/latest/
 [4]: https://www.python.org/downloads/release/python-278/#download
-[5]: t.me/BotFather
+[5]: https://t.me/botfather
