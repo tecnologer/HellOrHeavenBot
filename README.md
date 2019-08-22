@@ -1,6 +1,24 @@
 # HellOrHeavenBot
 
-Bot para telegram que registra las acciones buenas y malas de los usuarios.
+Bot multifuncion para telegram, soporta una variedad de [comandos](#comandos).
+
+La tarea principal para que fue creado es llevar un contador de boletos al infierno (`/hell`) o al cielo (`/heaven`), estos "boletos" son registrados por otro usuario. Cada usuario puede revisar sus estadisticas con el comando `/stats`.
+
+Adicional a esto se agrego un sistema para que los usuarios pudieran agregar respuestas (`/addanswer`) que el bot usara cuando se asigne un nuevo boleto. Estas respuestas son guardadas en una base de datos tipo JSON ([tinydb][2]), cuando se requiera el bot buscara y eligira una respuesta al azar.
+
+Separado del tema principal, puede reaccionar a palabras que se le envien, para agregar reacciones se usa el comando `/customanswer` el cual necesita una expresion regular, dicha expresion sera evaluada y si el mensaje cumple con ella, enviara la respuesta que se le asigno. Ejemplos:
+
+```
+# si un usuario escribe "hola", el bot respondera con un "hola"
+> /customanswer hola
+> hola
+
+# si le preguntan "como te llamas\?", el responde "me llamo luci"
+> /customanswer como te llamas\?
+> me llamo luci
+```
+
+**Nota:** Cada simbolo `>` indica que es un mensaje diferente.
 
 ## Comandos
 
@@ -14,7 +32,7 @@ Bot para telegram que registra las acciones buenas y malas de los usuarios.
 - `/cancel` => Cancela la peticion actual
 - `/voteanswer` => Te mostrara una propuesta de respuesta y esperara tu votacion usando: 👍 o 👎
 - `/stats` => Muestra tus estadisticas
-- `/customanswer <ReGex> [mensaje texto]` => Agregara una respuesta personalizada. Cuando se cumpla la expresion regular respondera con lo que se le indique mensaje, sticker o gif.
+- `/customanswer <ReGex>` => Agregara una respuesta personalizada. Cuando se cumpla la expresion regular respondera con lo que se le indique mensaje, sticker o gif.
 - `/reset` => Restablece tus estadisticas
 - `/all` => Modo Dios: Muestra todas las estadisticas
 - `/alias </comando>` => Muestra el alias para el comando elegido
