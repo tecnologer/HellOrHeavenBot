@@ -5,7 +5,7 @@ import com
 #     type = dao.HEAVEN
 #     if x % 2 == 0:
 #         type = dao.HELL
-    
+
 #     dao.Update('tecnologer', type)
 
 """ proposals =[
@@ -22,6 +22,6 @@ if prop != "":
     dao.UpdateScore('10244644', prop, True)
 
     prop = dao.GetRandomProposal('10244644')
-    
+
 if prop == "":
-    print "No hay"
+    print("No hay")
