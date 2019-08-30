@@ -10,7 +10,6 @@ import key
 import com
 import re
 import dao
-import base64
 import customanswer as ca
 from pprint import pprint
 
