@@ -1,5 +1,2 @@
-FROM python
-RUN pip install tinydb
-RUN pip install telepot
-ADD . /
-CMD ["python","-u", "/main.py"]
+FROM golang
+RUN go get -u gopkg.in/tucnak/telebot.v2
