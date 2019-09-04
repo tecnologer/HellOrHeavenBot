@@ -1,28 +1,29 @@
 package main
 
 import (
-	"time"
+	"bufio"
+	"log"
+	"os"
 
-	log "github.com/sirupsen/logrus"
-	"github.com/tecnologer/HellOrHeavenBot/resources"
-	bot "gopkg.in/tucnak/telebot.v2"
+	"github.com/tecnologer/HellOrHeavenBot/core"
 )
 
 func main() {
-	b, err := bot.NewBot(bot.Settings{
-		Token:  resources.BotToken,
-		Poller: &bot.LongPoller{Timeout: 10 * time.Second},
-	})
+	err := core.StartBot()
 
 	if err != nil {
 		log.Fatal(err)
-		return
 	}
 
-	b.Handle("/hello", func(m *bot.Message) {
-		b.Send(m.Sender, "hello world")
-	})
+	// waitExit()
+}
 
-	log.Println("Listening...")
-	b.Start()
+func waitExit() {
+	input := bufio.NewScanner(os.Stdin)
+	input.Scan()
+	in := input.Text()
+
+	for in != "c" {
+		in = input.Text()
+	}
 }

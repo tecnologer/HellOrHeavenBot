@@ -1,20 +1,15 @@
 package model
 
+import "time"
+
+const DefaultTimeout time.Duration = 10 * time.Second
+
 //Command is the base struct for bot commands
 type Command struct {
-	Name        string
+	ID          byte
+	Aliases     []string
 	Description string
 	Params      []string
 	Action      Action
-}
-
-//NewCommand returns a pointer for new instance of Command
-func NewCommand(name string) *Command {
-	if name == "" {
-		return nil
-	}
-
-	return &Command{
-		Name: name,
-	}
+	Timeout     time.Duration
 }

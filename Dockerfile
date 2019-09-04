@@ -1,2 +1,2 @@
 FROM golang
-RUN go get -u gopkg.in/tucnak/telebot.v2
+RUN go get -u github.com/yanzay/tbot
