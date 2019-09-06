@@ -15,19 +15,39 @@ func Hell(msg *bot.Message) {
 	doomedName := getDoomedName(msg.Text)
 
 	if doomedName == "" {
-		sendText(msg, "El nombre del condenado es requerido")
+		sendText(msg, cLang["ticketsNameRequired"])
 		return
 	}
 	err := db.InsertStat(doomedName, m.StatsHell)
 
 	if err != nil {
 		log.Println(err)
-		sendText(msg, "falio ferga, no funco")
+		sendText(msg, cLang["genericFail"])
 		return
 	}
 	SendResponse(msg, &m.Response{Content: "CAADAwADcQADJaHuBOXuxozHxyQrAg", Type: m.Sticker})
 }
 
+//Heaven is the function in charge of registering the hell tickets
+func Heaven(msg *bot.Message) {
+	doomedName := getDoomedName(msg.Text)
+
+	if doomedName == "" {
+		sendText(msg, cLang["ticketsNameRequired"])
+		return
+	}
+	err := db.InsertStat(doomedName, m.StatsHeaven)
+
+	if err != nil {
+		log.Println(err)
+		sendText(msg, cLang["genericFail"])
+		return
+	}
+
+	SendResponse(msg, &m.Response{Content: "CAADAwADcQADJaHuBOXuxozHxyQrAg", Type: m.Sticker})
+}
+
+//GetStats gets the count of tickets for the user who requested
 func GetStats(msg *bot.Message) {
 	stats := db.GetStats(strings.ToLower(msg.From.Username))
 
@@ -50,8 +70,4 @@ func getDoomedName(text string) string {
 	}
 
 	return strings.ToLower(tokens[1])
-	// if msg.From.Username != "" {
-	// 	return msg.From.Username
-	// }
-	// return strings.Join([]string{msg.From.FirstName, msg.From.LastName}, "")
 }

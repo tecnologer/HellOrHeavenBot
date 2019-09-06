@@ -6,3 +6,4 @@ key.py
 /key.py
 *.pyc
 dist/
+db/dbFiles/

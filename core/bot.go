@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	log "github.com/sirupsen/logrus"
+	"github.com/tecnologer/HellOrHeavenBot/lang"
 	"github.com/tecnologer/HellOrHeavenBot/resources"
 	bot "github.com/yanzay/tbot"
 )
@@ -13,6 +14,9 @@ var Bot *bot.Server
 
 //Client of the bot
 var Client *bot.Client
+
+//cLang is the group of messages for the language of the current message
+var cLang map[string]string
 
 //StartBot runs the bot
 func StartBot() error {
@@ -33,10 +37,17 @@ func StartBot() error {
 }
 
 func messagesHandle(msg *bot.Message) {
+	if msg.From.IsBot || msg.EditDate != 0 {
+		return
+	}
+
+	cLang = lang.GetMessagesByLanguage(msg.From.LanguageCode)
+
 	cmd := getCommand(msg.Text)
 
 	if cmd != "" {
-		CommandList[cmd].Action(msg)
+		AcceptedCommands.Call(cmd, msg)
+		return
 	}
 }
 
@@ -48,12 +59,4 @@ func getCommand(text string) string {
 	}
 
 	return ""
-}
-
-func registerHandlers() {
-	for _, cmd := range CommandList {
-		for _, alias := range cmd.Aliases {
-			Bot.HandleMessage("/"+alias, cmd.Action)
-		}
-	}
 }
