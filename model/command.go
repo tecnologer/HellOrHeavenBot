@@ -7,7 +7,7 @@ const DefaultTimeout time.Duration = 10 * time.Second
 
 //Command is the base struct for bot commands
 type Command struct {
-	ID              byte
+	ID              int
 	Aliases         []string
 	Description     string
 	Params          []string
