@@ -27,7 +27,7 @@ func init() {
 }
 
 func createTableChats() {
-	log.Printf("creating table %s\n", tableNameChats)
+	log.Debugf("creating table %s\n", tableNameChats)
 	if tableChatsIsCreated {
 		return
 	}
@@ -35,16 +35,16 @@ func createTableChats() {
 	err := execQueryNoResult(queryf(queryCreateTableChats, tableNameChats))
 	tableChatsIsCreated = err == nil
 	if !tableChatsIsCreated {
-		log.Println(err)
+		log.WithError(err).Errorf("error when try create table %s", tableNameChats)
 	} else {
-		log.Printf("table %s is created\n", tableNameChats)
+		log.Debugf("table %s is created\n", tableNameChats)
 	}
 
 }
 
 //InsertOrUpdateChat Inserts a new chat or update it if is exists
 func InsertOrUpdateChat(chat *model.Chat) error {
-	createTableStats()
+	createTableChats()
 
 	getChatByID := queryf(querySearchChatByID, tableNameChats, chat.ID)
 
@@ -53,6 +53,7 @@ func InsertOrUpdateChat(chat *model.Chat) error {
 	if err != nil {
 		return err
 	}
+
 	defer rows.Close()
 	var registeredChat *m.Chat
 

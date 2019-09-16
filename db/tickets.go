@@ -102,7 +102,7 @@ func GetStats(doomed string) *m.Stats {
 }
 
 func createTableStats() {
-	log.Printf("creating table %s\n", tableNameStats)
+	log.Debugf("creating table %s\n", tableNameStats)
 	if tableStatsIsCreated {
 		return
 	}
@@ -110,9 +110,9 @@ func createTableStats() {
 	err := execQueryNoResult(queryf(queryCreateTableStats, tableNameStats))
 	tableStatsIsCreated = err == nil
 	if err != nil {
-		log.Println(err)
+		log.WithError(err).Errorf("error when try create table %s", tableNameStats)
 	} else {
-		log.Printf("table %s is created\n", tableNameStats)
+		log.Debugf("table %s is created\n", tableNameStats)
 	}
 
 }

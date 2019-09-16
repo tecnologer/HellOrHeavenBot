@@ -19,7 +19,7 @@ func Open() (err error) {
 	Connection, err = sql.Open("sqlite3", "./db/dbFiles/luciack.db")
 
 	if err != nil {
-		log.Println("connection to database is created")
+		log.Debug("connection to database is created")
 	}
 	return
 }
@@ -27,7 +27,7 @@ func Open() (err error) {
 //Close closes the connection for database
 func Close() {
 	Connection.Close()
-	log.Println("connection to database is closed")
+	log.Debug("connection to database is closed")
 }
 
 //BeginTran starts a new transaction
@@ -53,7 +53,7 @@ func execQueryNoResult(query query) (err error) {
 	log.WithFields(log.Fields{
 		"query":     query,
 		"hasResutl": false,
-	}).Info("new query executed")
+	}).Debug("new query executed")
 	return
 }
 
@@ -61,7 +61,7 @@ func execQuery(q query) (*sql.Rows, error) {
 	log.WithFields(log.Fields{
 		"query":     q,
 		"hasResutl": true,
-	}).Info("new query executed")
+	}).Debug("new query executed")
 
 	return Connection.Query(q.String())
 }

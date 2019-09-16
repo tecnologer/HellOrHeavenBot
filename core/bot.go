@@ -37,7 +37,7 @@ func StartBot() error {
 	Bot.HandleMessage(".*", messagesHandle)
 	Bot.HandleCallback(callBackHandler)
 
-	log.Println("Listening...")
+	log.Info("Listening...")
 	StartupTime = time.Now()
 	Bot.Start()
 	return nil

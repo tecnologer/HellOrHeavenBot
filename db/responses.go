@@ -29,7 +29,7 @@ func init() {
 }
 
 func createTableResponses() {
-	log.Printf("creating table %s\n", tableNameResponses)
+	log.Debugf("creating table %s\n", tableNameResponses)
 	if tableResponsesIsCreated {
 		return
 	}
@@ -37,9 +37,9 @@ func createTableResponses() {
 	err := execQueryNoResult(queryf(queryCreateTableResponses, tableNameResponses))
 	tableResponsesIsCreated = err == nil
 	if !tableResponsesIsCreated {
-		log.Println(err)
+		log.WithError(err).Errorf("error when try create table %s", tableNameResponses)
 	} else {
-		log.Printf("table %s is created\n", tableNameResponses)
+		log.Debugf("table %s is created\n", tableNameResponses)
 	}
 
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"os"
 
 	log "github.com/sirupsen/logrus"
@@ -9,6 +10,8 @@ import (
 	"github.com/tecnologer/HellOrHeavenBot/db"
 	"github.com/tecnologer/HellOrHeavenBot/test"
 )
+
+var verbose = flag.Bool("v", false, "enabled verbose debug")
 
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
@@ -22,13 +25,19 @@ func init() {
 	} else {
 		log.Info("Failed to log to file, using default stderr")
 	}
-
-	// Only log the warning severity or above.
-	log.SetLevel(log.TraceLevel)
 }
 
 func main() {
-	log.Println("************************** new instance running **************************")
+	flag.Parse()
+
+	if *verbose {
+		// Only log the warning severity or above.
+		log.SetLevel(log.TraceLevel)
+	} else {
+		log.SetLevel(log.ErrorLevel)
+	}
+
+	log.Info("************************** new instance running **************************")
 	err := db.Open()
 
 	if err != nil {
