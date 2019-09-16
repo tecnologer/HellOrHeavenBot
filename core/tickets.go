@@ -42,7 +42,7 @@ func updateStats(msg *bot.Message, t m.StatsType) {
 		sendText(msg, cLang["ticketsNameRequired"])
 		return
 	}
-	err := db.InsertStat(doomedName, m.StatsHeaven)
+	err := db.InsertStat(doomedName, t)
 
 	if err != nil {
 		log.Println(err)
