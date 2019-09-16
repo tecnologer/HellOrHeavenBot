@@ -55,6 +55,14 @@ func init() {
 			Action:          NewResponse,
 			AcceptsResponse: false,
 		},
+		&model.Command{
+			ID:              6,
+			Aliases:         []string{"cancel", "cancelar"},
+			Description:     "Cancela la accion actual",
+			Timeout:         model.DefaultTimeout,
+			Action:          Cancel,
+			AcceptsResponse: true,
+		},
 	}
 }
 
@@ -65,4 +73,14 @@ func (l CommandList) Call(cmd string, msg *bot.Message) {
 			c.Action(msg)
 		}
 	}
+}
+
+//GetID search the command and returns its id
+func (l CommandList) GetID(cmd string) int {
+	for _, c := range l {
+		if c.HasAlias(cmd) {
+			return c.ID
+		}
+	}
+	return -1
 }
