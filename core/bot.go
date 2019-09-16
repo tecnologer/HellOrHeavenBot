@@ -1,6 +1,7 @@
 package core
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -59,7 +60,7 @@ func messagesHandle(msg *bot.Message) {
 		AcceptedCommands.Call(cmd, msg)
 		return
 	} else if HasUserIncompleteRes(msg) {
-		SetContentToIncomplete(msg, msg.Text)
+		setContentToIncomplete(msg)
 	}
 }
 
@@ -68,8 +69,14 @@ func callBackHandler(cq *bot.CallbackQuery) {
 	// 	"query": cq,
 	// }).Info("new call back query")
 
-	if strings.HasPrefix(cq.Data, "type:") {
-
+	if strings.HasPrefix(cq.Data, "type:") && HasUserIncompleteRes((cq.Message)) {
+		cmdIDString := strings.ReplaceAll(cq.Data, "type: ", "")
+		cmdID, err := strconv.Atoi(cmdIDString)
+		if err != nil {
+			log.WithError(err).Error("callback query command id invalid")
+			return
+		}
+		setCmdIDToIncomplete(cq.Message, byte(cmdID))
 	}
 }
 
