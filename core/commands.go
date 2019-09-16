@@ -19,7 +19,7 @@ var AcceptedCommands = CommandList{
 		Action:      Hell,
 	},
 	&model.Command{
-		ID:          1,
+		ID:          2,
 		Aliases:     []string{"heaven", "cielo"},
 		Description: "Agrega al usuario un boleto al cielo",
 		Params:      []string{"<username>"},
@@ -27,14 +27,14 @@ var AcceptedCommands = CommandList{
 		Action:      Heaven,
 	},
 	&model.Command{
-		ID:          1,
+		ID:          3,
 		Aliases:     []string{"stats", "estadisticas"},
 		Description: "Retorna la cantidad de tickets al cielo y al infierno",
 		Timeout:     model.DefaultTimeout,
 		Action:      GetStats,
 	},
 	&model.Command{
-		ID:          1,
+		ID:          4,
 		Aliases:     []string{"start"},
 		Description: "Inicia el bot",
 		Timeout:     model.DefaultTimeout,

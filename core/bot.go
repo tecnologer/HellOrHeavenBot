@@ -2,12 +2,16 @@ package core
 
 import (
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tecnologer/HellOrHeavenBot/lang"
 	"github.com/tecnologer/HellOrHeavenBot/resources"
 	bot "github.com/yanzay/tbot"
 )
+
+//StartupTime time when the bot is started
+var StartupTime time.Time
 
 //Bot is the instance of the bot
 var Bot *bot.Server
@@ -32,6 +36,7 @@ func StartBot() error {
 	Bot.HandleMessage(".*", messagesHandle)
 
 	log.Println("Listening...")
+	StartupTime = time.Now()
 	Bot.Start()
 	return nil
 }

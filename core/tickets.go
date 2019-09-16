@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/tecnologer/HellOrHeavenBot/resources"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/tecnologer/HellOrHeavenBot/db"
 	m "github.com/tecnologer/HellOrHeavenBot/model"
@@ -12,39 +14,12 @@ import (
 
 //Hell is the function in charge of registering the hell tickets
 func Hell(msg *bot.Message) {
-	doomedName := getDoomedName(msg.Text)
-
-	if doomedName == "" {
-		sendText(msg, cLang["ticketsNameRequired"])
-		return
-	}
-	err := db.InsertStat(doomedName, m.StatsHell)
-
-	if err != nil {
-		log.Println(err)
-		sendText(msg, cLang["genericFail"])
-		return
-	}
-	SendResponse(msg, &m.Response{Content: "CAADAwADcQADJaHuBOXuxozHxyQrAg", Type: m.Sticker})
+	go updateStats(msg, m.StatsHell)
 }
 
 //Heaven is the function in charge of registering the hell tickets
 func Heaven(msg *bot.Message) {
-	doomedName := getDoomedName(msg.Text)
-
-	if doomedName == "" {
-		sendText(msg, cLang["ticketsNameRequired"])
-		return
-	}
-	err := db.InsertStat(doomedName, m.StatsHeaven)
-
-	if err != nil {
-		log.Println(err)
-		sendText(msg, cLang["genericFail"])
-		return
-	}
-
-	SendResponse(msg, &m.Response{Content: "CAADAwADcQADJaHuBOXuxozHxyQrAg", Type: m.Sticker})
+	go updateStats(msg, m.StatsHeaven)
 }
 
 //GetStats gets the count of tickets for the user who requested
@@ -59,15 +34,45 @@ func GetStats(msg *bot.Message) {
 	sendText(msg, fmt.Sprintf("Hell: %d, Heaven: %d", stats.Hell, stats.Heaven))
 }
 
-func getDoomedName(text string) string {
+//updateStats calls the functions to update database
+func updateStats(msg *bot.Message, t m.StatsType) {
+	doomedName := getDoomedName(msg.Text)
+
+	if doomedName == "" {
+		sendText(msg, cLang["ticketsNameRequired"])
+		return
+	}
+	err := db.InsertStat(doomedName, m.StatsHeaven)
+
+	if err != nil {
+		log.Println(err)
+		sendText(msg, cLang["genericFail"])
+		return
+	}
+
+	//command ID
+	cmdID := 1
+	if t == m.StatsHeaven {
+		cmdID = 2
+	}
+
+	res, err := db.GetResponseByCommand(cmdID)
+	if err != nil {
+		log.Println(err)
+		sendText(msg, cLang["genericResponse"])
+		return
+	}
+
+	SendResponse(msg, res)
+}
+
+func getDoomedName(text string) (name string) {
 	tokens := strings.Split(text, " ")
 	if len(tokens) < 2 {
-		return ""
+		return
 	}
+	name = strings.ToLower(tokens[1])
+	name = resources.LeftTrimAtSign(name)
 
-	if strings.HasPrefix(tokens[1], "@") {
-		return strings.ToLower(tokens[1][1:])
-	}
-
-	return strings.ToLower(tokens[1])
+	return
 }
