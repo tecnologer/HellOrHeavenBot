@@ -51,12 +51,14 @@ func updateStats(msg *bot.Message, t m.StatsType) {
 	}
 
 	//command ID
-	cmdID := 1
+	var cmdID int
 	if t == m.StatsHeaven {
-		cmdID = 2
+		cmdID = AcceptedCommands.GetID("heaven")
+	} else {
+		cmdID = AcceptedCommands.GetID("hell")
 	}
 
-	res, err := db.GetResponseByCommand(cmdID)
+	res, err := db.GetResponseByCommand(cmdID, msg.From.LanguageCode)
 	if err != nil {
 		log.Println(err)
 		sendText(msg, cLang["genericResponse"])
