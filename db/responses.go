@@ -18,10 +18,11 @@ const (
 		[Id] integer not null primary key AUTOINCREMENT,
 		[Type] integer not null,
 		[CommandID] integer not null,
-		[Response] text not null
+		[Response] text not null,
+		[Language] text not null
 	);`
-	queryGetResponseCommand = "SELECT [CommandID], [Response],[Type] FROM [%s] WHERE [CommandID] = %d;"
-	queryInsertResponse     = "INSERT INTO [%s] (Type, CommandID, Response) VALUES (%d, %d, '%s');"
+	queryGetResponseCommand = "SELECT [CommandID], [Response],[Type] FROM [%s] WHERE [CommandID] = %d AND [Language] = '%s';"
+	queryInsertResponse     = "INSERT INTO [%s] (Type, CommandID, Response, Language) VALUES (%d, %d, '%s', '%s');"
 )
 
 func init() {
@@ -48,7 +49,7 @@ func createTableResponses() {
 func InsertResponse(res *model.Response) error {
 	createTableResponses()
 
-	tmpQuery := queryf(queryInsertResponse, tableNameResponses, res.Type, res.CommandID, res.Content)
+	tmpQuery := queryf(queryInsertResponse, tableNameResponses, res.Type, res.CommandID, res.Content, res.Language)
 
 	err := execQueryNoResult(tmpQuery)
 	if err != nil {
@@ -58,8 +59,8 @@ func InsertResponse(res *model.Response) error {
 }
 
 //GetResponseByCommand select a response (random) assigned to the command
-func GetResponseByCommand(comID int) (*model.Response, error) {
-	tmpQuery := queryf(queryGetResponseCommand, tableNameResponses, comID)
+func GetResponseByCommand(comID int, lang string) (*model.Response, error) {
+	tmpQuery := queryf(queryGetResponseCommand, tableNameResponses, comID, lang)
 	rows, err := execQuery(tmpQuery)
 
 	if err != nil {
