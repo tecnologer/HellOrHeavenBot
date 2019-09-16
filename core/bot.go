@@ -43,6 +43,10 @@ func StartBot() error {
 }
 
 func messagesHandle(msg *bot.Message) {
+	// log.WithFields(log.Fields{
+	// 	"msg": msg,
+	// }).Info("new message")
+
 	if msg.From.IsBot || msg.EditDate != 0 {
 		return
 	}
@@ -54,13 +58,19 @@ func messagesHandle(msg *bot.Message) {
 	if cmd != "" {
 		AcceptedCommands.Call(cmd, msg)
 		return
+	} else if HasUserIncompleteRes(msg) {
+		SetContentToIncomplete(msg, msg.Text)
 	}
 }
 
 func callBackHandler(cq *bot.CallbackQuery) {
-	log.WithFields(log.Fields{
-		"query": cq,
-	})
+	// log.WithFields(log.Fields{
+	// 	"query": cq,
+	// }).Info("new call back query")
+
+	if strings.HasPrefix(cq.Data, "type:") {
+
+	}
 }
 
 func getCommand(text string) string {
