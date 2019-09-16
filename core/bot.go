@@ -34,6 +34,7 @@ func StartBot() error {
 
 	// registerHandlers()
 	Bot.HandleMessage(".*", messagesHandle)
+	Bot.HandleCallback(callBackHandler)
 
 	log.Println("Listening...")
 	StartupTime = time.Now()
@@ -54,6 +55,12 @@ func messagesHandle(msg *bot.Message) {
 		AcceptedCommands.Call(cmd, msg)
 		return
 	}
+}
+
+func callBackHandler(cq *bot.CallbackQuery) {
+	log.WithFields(log.Fields{
+		"query": cq,
+	})
 }
 
 func getCommand(text string) string {

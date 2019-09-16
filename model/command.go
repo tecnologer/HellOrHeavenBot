@@ -7,12 +7,13 @@ const DefaultTimeout time.Duration = 10 * time.Second
 
 //Command is the base struct for bot commands
 type Command struct {
-	ID          byte
-	Aliases     []string
-	Description string
-	Params      []string
-	Action      Action
-	Timeout     time.Duration
+	ID              byte
+	Aliases         []string
+	Description     string
+	Params          []string
+	Action          Action
+	Timeout         time.Duration
+	AcceptsResponse bool
 }
 
 //HasAlias returns true if the alias is in the list of aliases
