@@ -8,3 +8,4 @@ key.py
 dist/
 db/dbFiles/
 *.log
+/HellOrHeavenBot
