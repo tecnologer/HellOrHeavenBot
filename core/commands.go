@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+
 	"github.com/tecnologer/HellOrHeavenBot/model"
 	bot "github.com/yanzay/tbot"
 )
@@ -63,6 +65,30 @@ func init() {
 			Action:          Cancel,
 			AcceptsResponse: true,
 		},
+		&model.Command{
+			ID:              7,
+			Aliases:         []string{"uptime"},
+			Description:     "Regresa el tiempo de ejecucion",
+			Timeout:         model.DefaultTimeout,
+			Action:          Uptime,
+			AcceptsResponse: false,
+		},
+		&model.Command{
+			ID:              8,
+			Aliases:         []string{"help", "ayuda"},
+			Description:     "Lista de comandos",
+			Timeout:         model.DefaultTimeout,
+			Action:          SendHelp,
+			AcceptsResponse: false,
+		},
+		&model.Command{
+			ID:              9,
+			Aliases:         []string{"alias"},
+			Description:     "Lista de comandos",
+			Timeout:         model.DefaultTimeout,
+			Action:          GetAlias,
+			AcceptsResponse: false,
+		},
 	}
 }
 
@@ -83,4 +109,14 @@ func (l CommandList) GetID(cmd string) int {
 		}
 	}
 	return -1
+}
+
+func (l CommandList) GetCmdByID(cmdID int) (*model.Command, error) {
+	for _, c := range l {
+		if c.ID == cmdID {
+			return c, nil
+		}
+	}
+
+	return nil, fmt.Errorf("no se encontro comando con el id %d", cmdID)
 }
