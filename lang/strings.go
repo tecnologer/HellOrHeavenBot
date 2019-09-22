@@ -12,7 +12,7 @@ var messages = languageList{
 	"es": map[string]string{
 		"ticketsNameRequired":    "El nombre del condenado es requerido",
 		"genericFail":            "falio ferga!",
-		"requestResponseContent": "El siguiente mensaje que envies se tomara como respuesta. Puedes user texto, sticker o gif",
+		"requestResponseContent": "El siguiente mensaje que envies se tomara como respuesta. Puedes usar texto, sticker o gif",
 		"responseStored":         "Listoooo!!",
 		"genericCancel":          "Accion cancelada",
 	},
