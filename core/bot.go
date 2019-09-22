@@ -59,8 +59,8 @@ func messagesHandle(msg *bot.Message) {
 	if cmd != "" {
 		AcceptedCommands.Call(cmd, msg)
 		return
-	} else if HasUserIncompleteRes(msg) {
-		setContentToIncomplete(msg)
+	} else if HasUserIncompleteRes(msg.From) {
+		setContentToIncomplete(msg.From, msg)
 	}
 }
 
@@ -69,14 +69,29 @@ func callBackHandler(cq *bot.CallbackQuery) {
 	// 	"query": cq,
 	// }).Info("new call back query")
 
-	if strings.HasPrefix(cq.Data, "type:") && HasUserIncompleteRes((cq.Message)) {
+	if strings.HasPrefix(cq.Data, "type:") && HasUserIncompleteRes(cq.From) {
 		cmdIDString := strings.ReplaceAll(cq.Data, "type: ", "")
 		cmdID, err := strconv.Atoi(cmdIDString)
 		if err != nil {
 			log.WithError(err).Error("callback query command id invalid")
 			return
 		}
-		setCmdIDToIncomplete(cq.Message, byte(cmdID))
+		setCmdIDToIncomplete(cq.From, cq.Message, byte(cmdID))
+	} else if strings.HasPrefix(cq.Data, "alias:") {
+		cmdIDString := strings.ReplaceAll(cq.Data, "alias: ", "")
+		cmdID, err := strconv.Atoi(cmdIDString)
+		if err != nil {
+			log.WithError(err).Error("callback query command id invalid")
+			return
+		}
+
+		cmd, err := AcceptedCommands.GetCmdByID(cmdID)
+		if err != nil {
+			log.WithError(err)
+			return
+		}
+
+		GetAliasOfCmd(cq.Message, cmd)
 	}
 }
 
