@@ -19,10 +19,11 @@ const (
 		[Type] integer not null,
 		[CommandID] integer not null,
 		[Response] text not null,
-		[Language] text not null
+		[Language] text not null,
+		[IsAnimated] integr
 	);`
-	queryGetResponseCommand = "SELECT [CommandID], [Response],[Type] FROM [%s] WHERE [CommandID] = %d AND [Language] = '%s';"
-	queryInsertResponse     = "INSERT INTO [%s] (Type, CommandID, Response, Language) VALUES (%d, %d, '%s', '%s');"
+	queryGetResponseCommand = "SELECT [CommandID], [Response],[Type], [IsAnimated] FROM [%s] WHERE [CommandID] = %d AND [Language] = '%s';"
+	queryInsertResponse     = "INSERT INTO [%s] (Type, CommandID, Response, Language, IsAnimated) VALUES (%d, %d, '%s', '%s', %t);"
 )
 
 func init() {
@@ -49,7 +50,7 @@ func createTableResponses() {
 func InsertResponse(res *model.Response) error {
 	createTableResponses()
 
-	tmpQuery := queryf(queryInsertResponse, tableNameResponses, res.Type, res.CommandID, res.Content, res.Language)
+	tmpQuery := queryf(queryInsertResponse, tableNameResponses, res.Type, res.CommandID, res.Content, res.Language, res.IsAnimated)
 
 	err := execQueryNoResult(tmpQuery)
 	if err != nil {
@@ -84,6 +85,8 @@ func GetResponseByCommand(comID int, lang string) (*model.Response, error) {
 
 	if len(responses) == 0 {
 		return nil, fmt.Errorf("no responses for the selected command")
+	} else if len(responses) == 1 {
+		return responses[0], nil
 	}
 
 	selection := resources.GetRandomIntFromRange(0, len(responses)-1)
