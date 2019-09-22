@@ -12,10 +12,10 @@ import (
 	bot "github.com/yanzay/tbot"
 )
 
-var incompleteResponse map[string]*model.Response
+var incompleteResponse map[uint32]*model.Response
 
 func init() {
-	incompleteResponse = make(map[string]*model.Response)
+	incompleteResponse = make(map[uint32]*model.Response)
 }
 
 //NewResponse starts process to insert new response
@@ -31,7 +31,7 @@ func NewResponse(msg *bot.Message) {
 
 	defer func() {
 		if incomplete {
-			identifier := getResponseIdentifier(msg)
+			identifier := getResponseIdentifier(msg.From)
 			incompleteResponse[identifier] = newResponse
 		} else {
 			addResponse(msg, newResponse)
@@ -51,9 +51,9 @@ func NewResponse(msg *bot.Message) {
 }
 
 //HasUserIncompleteRes returns true if the user of the messages has incomplete responses
-func HasUserIncompleteRes(msg *bot.Message) bool {
+func HasUserIncompleteRes(from *bot.User) bool {
 
-	identifier := getResponseIdentifier(msg)
+	identifier := getResponseIdentifier(from)
 	_, exists := incompleteResponse[identifier]
 
 	return exists
@@ -100,7 +100,7 @@ func getResponseParams(text string) (byte, string) {
 	return byte(cmdID), content
 }
 
-func getButtons() *bot.InlineKeyboardMarkup {
+func getResponseButtons() *bot.InlineKeyboardMarkup {
 	var buttons []bot.InlineKeyboardButton
 
 	for _, c := range AcceptedCommands {
@@ -123,19 +123,19 @@ func getButtons() *bot.InlineKeyboardMarkup {
 }
 
 func sendResponsesCommandsButtons(msg *bot.Message) {
-	buttons := getButtons()
+	buttons := getResponseButtons()
 	_, err := Client.SendMessage(msg.Chat.ID, "Selecciona un tipo", bot.OptInlineKeyboardMarkup(buttons))
 	if err != nil {
 		log.Println(err)
 	}
 }
 
-func setContentToIncomplete(msg *bot.Message) {
-	if !HasUserIncompleteRes(msg) {
+func setContentToIncomplete(from *bot.User, msg *bot.Message) {
+	if !HasUserIncompleteRes(from) {
 		return
 	}
 
-	identifier := getResponseIdentifier(msg)
+	identifier := getResponseIdentifier(from)
 	res, _ := incompleteResponse[identifier]
 
 	if msg.Sticker != nil {
@@ -149,22 +149,22 @@ func setContentToIncomplete(msg *bot.Message) {
 		res.Content = msg.Text
 	}
 
-	isResponseComplete(msg)
+	isResponseComplete(from, msg)
 }
 
-func setCmdIDToIncomplete(msg *bot.Message, cmdID byte) {
-	if !HasUserIncompleteRes(msg) {
+func setCmdIDToIncomplete(from *bot.User, msg *bot.Message, cmdID byte) {
+	if !HasUserIncompleteRes(from) {
 		return
 	}
 
-	identifier := getResponseIdentifier(msg)
+	identifier := getResponseIdentifier(from)
 	incompleteResponse[identifier].CommandID = cmdID
 
-	isResponseComplete(msg)
+	isResponseComplete(from, msg)
 }
 
-func isResponseComplete(msg *bot.Message) {
-	identifier := getResponseIdentifier(msg)
+func isResponseComplete(from *bot.User, msg *bot.Message) {
+	identifier := getResponseIdentifier(from)
 	res, _ := incompleteResponse[identifier]
 
 	if res.CommandID == 0 {
@@ -186,6 +186,10 @@ func isResponseComplete(msg *bot.Message) {
 }
 
 func addResponse(msg *bot.Message, newResponse *model.Response) error {
+	if newResponse.Language == "" {
+		newResponse.Language = msg.From.LanguageCode
+	}
+
 	err := db.InsertResponse(newResponse)
 	if err != nil {
 		return err
@@ -195,7 +199,9 @@ func addResponse(msg *bot.Message, newResponse *model.Response) error {
 	return nil
 }
 
-func getResponseIdentifier(msg *bot.Message) string {
-	name := resources.GetName(msg)
-	return resources.GetHash(msg.From.ID, name)
+func getResponseIdentifier(from *bot.User) uint32 {
+	name := resources.GetName(from)
+	ident := resources.GetHash(from.ID, name)
+	log.WithField("identifier", ident).Info("identifier calculated")
+	return ident
 }
