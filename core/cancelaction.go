@@ -8,8 +8,8 @@ import (
 
 //Cancel cancels the current task
 func Cancel(msg *bot.Message) {
-	if HasUserIncompleteRes(msg) {
-		identifier := getResponseIdentifier((msg))
+	if HasUserIncompleteRes(msg.From) {
+		identifier := getResponseIdentifier(msg.From)
 		delete(incompleteResponse, identifier)
 	}
 
