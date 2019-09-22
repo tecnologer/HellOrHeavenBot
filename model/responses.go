@@ -5,10 +5,11 @@ type ResponseType byte
 
 //Response is the struct to manage the responses for the commands
 type Response struct {
-	Content   string       `json:"a"`
-	Type      ResponseType `json:"at"`
-	CommandID byte         `json:"t"`
-	Language  string
+	Content    string       `json:"a"`
+	Type       ResponseType `json:"at"`
+	CommandID  byte         `json:"t"`
+	Language   string
+	IsAnimated bool
 }
 
 const (
