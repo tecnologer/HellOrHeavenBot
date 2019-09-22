@@ -28,21 +28,21 @@ func GetRandomIntFromRange(min, max int) int {
 }
 
 //GetName extrats the username of the user who send the message
-func GetName(msg *bot.Message) string {
-	if msg.From.Username != "" {
-		return msg.From.Username
+func GetName(from *bot.User) string {
+	if from.Username != "" {
+		return from.Username
 	}
 
-	return fmt.Sprintf("%s %s", msg.From.FirstName, msg.From.LastName)
+	return fmt.Sprintf("%s %s", from.FirstName, from.LastName)
 }
 
 //GetHash create a hash value from values
-func GetHash(elements ...interface{}) string {
+func GetHash(elements ...interface{}) uint32 {
 	return hash(fmt.Sprint(elements...))
 }
 
-func hash(s string) string {
+func hash(s string) uint32 {
 	h := fnv.New32a()
 	h.Write([]byte(s))
-	return string(h.Sum32())
+	return h.Sum32()
 }
