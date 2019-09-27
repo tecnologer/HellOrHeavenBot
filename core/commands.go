@@ -111,6 +111,7 @@ func (l CommandList) GetID(cmd string) int {
 	return -1
 }
 
+//GetCmdByID returns the Command searching by its ID
 func (l CommandList) GetCmdByID(cmdID int) (*model.Command, error) {
 	for _, c := range l {
 		if c.ID == cmdID {
