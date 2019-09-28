@@ -1,13 +1,8 @@
 package db
 
 import (
-	"fmt"
-
-	"github.com/tecnologer/HellOrHeavenBot/resources"
-
 	log "github.com/sirupsen/logrus"
 	"github.com/tecnologer/HellOrHeavenBot/model"
-	m "github.com/tecnologer/HellOrHeavenBot/model"
 )
 
 var tableResponsesIsCreated bool
@@ -36,13 +31,13 @@ func createTableResponses() {
 		return
 	}
 
-	err := execQueryNoResult(queryf(queryCreateTableResponses, tableNameResponses))
-	tableResponsesIsCreated = err == nil
-	if !tableResponsesIsCreated {
-		log.WithError(err).Errorf("error when try create table %s", tableNameResponses)
-	} else {
-		log.Debugf("table %s is created\n", tableNameResponses)
-	}
+	// err := execQueryNoResult(queryf(queryCreateTableResponses, tableNameResponses))
+	// tableResponsesIsCreated = err == nil
+	// if !tableResponsesIsCreated {
+	// 	log.WithError(err).Errorf("error when try create table %s", tableNameResponses)
+	// } else {
+	// 	log.Debugf("table %s is created\n", tableNameResponses)
+	// }
 
 }
 
@@ -50,46 +45,47 @@ func createTableResponses() {
 func InsertResponse(res *model.Response) error {
 	createTableResponses()
 
-	tmpQuery := queryf(queryInsertResponse, tableNameResponses, res.Type, res.CommandID, res.Content, res.Language, res.IsAnimated)
+	// tmpQuery := queryf(queryInsertResponse, tableNameResponses, res.Type, res.CommandID, res.Content, res.Language, res.IsAnimated)
 
-	err := execQueryNoResult(tmpQuery)
-	if err != nil {
-		return err
-	}
+	// err := execQueryNoResult(tmpQuery)
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
 //GetResponseByCommand select a response (random) assigned to the command
 func GetResponseByCommand(comID int, lang string) (*model.Response, error) {
-	tmpQuery := queryf(queryGetResponseCommand, tableNameResponses, comID, lang)
-	rows, err := execQuery(tmpQuery)
+	// tmpQuery := queryf(queryGetResponseCommand, tableNameResponses, comID, lang)
+	// rows, err := execQuery(tmpQuery)
 
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var responses []*model.Response
-	for rows.Next() {
-		response := new(m.Response)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// defer rows.Close()
+	// var responses []*model.Response
+	// for rows.Next() {
+	// 	response := new(m.Response)
 
-		err = rows.Scan(&response.CommandID, &response.Content, &response.Type)
-		if err != nil {
-			return nil, err
-		}
-		responses = append(responses, response)
-	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
-	}
+	// 	err = rows.Scan(&response.CommandID, &response.Content, &response.Type)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// 	responses = append(responses, response)
+	// }
+	// err = rows.Err()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	if len(responses) == 0 {
-		return nil, fmt.Errorf("no responses for the selected command")
-	} else if len(responses) == 1 {
-		return responses[0], nil
-	}
+	// if len(responses) == 0 {
+	// 	return nil, fmt.Errorf("no responses for the selected command")
+	// } else if len(responses) == 1 {
+	// 	return responses[0], nil
+	// }
 
-	selection := resources.GetRandomIntFromRange(0, len(responses)-1)
+	// selection := resources.GetRandomIntFromRange(0, len(responses)-1)
 
-	return responses[selection], nil
+	// return responses[selection], nil
+	return nil, nil
 }

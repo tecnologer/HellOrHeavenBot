@@ -37,5 +37,5 @@ func (g ConditionGroup) ToString() string {
 		return fmt.Sprintf("%s", g.ConLeft.ToString())
 	}
 
-	return fmt.Sprintf("%s %s %s", g.ConLeft.ToString(), g.LogOp, g.ConRight.ToString())
+	return fmt.Sprintf("(%s %s %s)", g.ConLeft.ToString(), g.LogOp, g.ConRight.ToString())
 }

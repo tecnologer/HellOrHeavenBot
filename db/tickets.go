@@ -28,57 +28,57 @@ func init() {
 
 //InsertStat inserts or update registers for stats
 func InsertStat(doomed string, t m.StatsType) error {
-	createTableStats()
+	// createTableStats()
 
-	getStatsByUser := queryf(queryGetStatsByUsername, tableNameStats, doomed)
+	// getStatsByUser := queryf(queryGetStatsByUsername, tableNameStats, doomed)
 
-	rows, err := execQuery(getStatsByUser)
+	// rows, err := execQuery(getStatsByUser)
 
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-	var doomedStats *m.Stats
+	// if err != nil {
+	// 	return err
+	// }
+	// defer rows.Close()
+	// var doomedStats *m.Stats
 
-	for rows.Next() {
-		doomedStats = new(m.Stats)
-		err = rows.Scan(&doomedStats.Hell, &doomedStats.Heaven, &doomedStats.UserName)
-		if err != nil {
-			return err
-		}
-	}
-	err = rows.Err()
-	if err != nil {
-		return err
-	}
-	var isInsert = doomedStats == nil
-	var tmpQuery query
+	// for rows.Next() {
+	// 	doomedStats = new(m.Stats)
+	// 	err = rows.Scan(&doomedStats.Hell, &doomedStats.Heaven, &doomedStats.UserName)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// }
+	// err = rows.Err()
+	// if err != nil {
+	// 	return err
+	// }
+	// var isInsert = doomedStats == nil
+	// var tmpQuery query
 
-	if isInsert {
-		hell, heaven := 0, 0
-		if t == m.StatsHeaven {
-			heaven = 1
-		} else {
-			hell = 1
-		}
+	// if isInsert {
+	// 	hell, heaven := 0, 0
+	// 	if t == m.StatsHeaven {
+	// 		heaven = 1
+	// 	} else {
+	// 		hell = 1
+	// 	}
 
-		tmpQuery = queryf(queryInsertStatsByUsername, tableNameStats, hell, heaven, doomed)
-	} else {
-		if t == m.StatsHell {
-			doomedStats.Hell++
-		}
+	// 	tmpQuery = queryf(queryInsertStatsByUsername, tableNameStats, hell, heaven, doomed)
+	// } else {
+	// 	if t == m.StatsHell {
+	// 		doomedStats.Hell++
+	// 	}
 
-		if t == m.StatsHeaven {
-			doomedStats.Heaven++
-		}
+	// 	if t == m.StatsHeaven {
+	// 		doomedStats.Heaven++
+	// 	}
 
-		tmpQuery = queryf(queryUpdateStatsByUsername, tableNameStats, doomedStats.Hell, doomedStats.Heaven, doomedStats.UserName)
-	}
+	// 	tmpQuery = queryf(queryUpdateStatsByUsername, tableNameStats, doomedStats.Hell, doomedStats.Heaven, doomedStats.UserName)
+	// }
 
-	err = execQueryNoResult(tmpQuery)
-	if err != nil {
-		return err
-	}
+	// err = execQueryNoResult(tmpQuery)
+	// if err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
@@ -107,12 +107,12 @@ func createTableStats() {
 		return
 	}
 
-	err := execQueryNoResult(queryf(queryCreateTableStats, tableNameStats))
-	tableStatsIsCreated = err == nil
-	if err != nil {
-		log.WithError(err).Errorf("error when try create table %s", tableNameStats)
-	} else {
-		log.Debugf("table %s is created\n", tableNameStats)
-	}
+	// err := execQueryNoResult(queryf(queryCreateTableStats, tableNameStats))
+	// tableStatsIsCreated = err == nil
+	// if err != nil {
+	// 	log.WithError(err).Errorf("error when try create table %s", tableNameStats)
+	// } else {
+	// 	log.Debugf("table %s is created\n", tableNameStats)
+	// }
 
 }

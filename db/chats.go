@@ -1,54 +1,50 @@
 package db
 
 import (
-	log "github.com/sirupsen/logrus"
-	"github.com/tecnologer/HellOrHeavenBot/model"
+	hpr "github.com/tecnologer/HellOrHeavenBot/db/dbhelp"
 	m "github.com/tecnologer/HellOrHeavenBot/model"
 )
 
 var tableChatsIsCreated bool
+var chatsTable = &hpr.SQLTable{
+	Name: "ChatLog",
+	Columns: []*hpr.SQLColumn{
+		hpr.NewPKCol("Id"),
+		hpr.NewIntCol("ChatID"),
+		hpr.NewTextCol("Name"),
+	},
+}
 
 const (
-	tableNameChats        = "ChatLog"
-	queryCreateTableChats = `CREATE TABLE IF NOT EXISTS [%s] (
-		[Id] integer not null primary key AUTOINCREMENT,
-		[ChatId] integer not null,
-		[Name] text not null
-	)`
-	querySearchChatByName = "SELECT [ChatId], [Name] FROM [%s] WHERE [Name] like '%%%s%%'"
-	querySearchChatByID   = "SELECT [ChatId], [Name] FROM [%s] WHERE [ChatId] = %d"
-	queryGetChatByName    = "SELECT [ChatId], [Name] FROM [%s] WHERE [Name] = '%s'"
-	queryUpdateChat       = "UPDATE [%s] SET [Name]=%s WHERE [ChatId]=%d;"
-	queryInsertChat       = "INSERT INTO [%s] (ChatId, Name) VALUES (%d, '%s');"
+// querySearchChatByName = "SELECT [ChatId], [Name] FROM [%s] WHERE [Name] like '%%%s%%'"
+//querySearchChatByID = "SELECT [ChatId], [Name] FROM [%s] WHERE [ChatId] = %d"
+// queryGetChatByName = "SELECT [ChatId], [Name] FROM [%s] WHERE [Name] = '%s'"
+// queryUpdateChat    = "UPDATE [%s] SET [Name]=%s WHERE [ChatId]=%d;"
+// queryInsertChat    = "INSERT INTO [%s] (ChatId, Name) VALUES (%d, '%s');"
 )
 
 func init() {
-	createTableChats()
-}
-
-func createTableChats() {
-	log.Debugf("creating table %s\n", tableNameChats)
-	if tableChatsIsCreated {
-		return
-	}
-
-	err := execQueryNoResult(queryf(queryCreateTableChats, tableNameChats))
-	tableChatsIsCreated = err == nil
-	if !tableChatsIsCreated {
-		log.WithError(err).Errorf("error when try create table %s", tableNameChats)
-	} else {
-		log.Debugf("table %s is created\n", tableNameChats)
-	}
-
+	chatsTable.Create()
 }
 
 //InsertOrUpdateChat Inserts a new chat or update it if is exists
-func InsertOrUpdateChat(chat *model.Chat) error {
-	createTableChats()
+func InsertOrUpdateChat(chat *m.Chat) error {
+	err := chatsTable.Create()
+	if err != nil {
+		return err
+	}
 
-	getChatByID := queryf(querySearchChatByID, tableNameChats, chat.ID)
+	conditions := []*hpr.ConditionGroup{
+		&hpr.ConditionGroup{
+			ConLeft: &hpr.Condition{
+				Column: chatsTable.Columns[1],
+				RelOp:  hpr.Eq,
+				Value:  chat.ID,
+			},
+		},
+	}
 
-	rows, err := execQuery(getChatByID)
+	rows, err := chatsTable.ExecSelectCols([]string{"ChatId", "Name"}, conditions)
 
 	if err != nil {
 		return err
@@ -69,21 +65,23 @@ func InsertOrUpdateChat(chat *model.Chat) error {
 		return err
 	}
 	var isInsert = registeredChat == nil
-	var tmpQuery query
 
 	if isInsert {
-
-		tmpQuery = queryf(queryInsertChat, tableNameChats, chat.ID, chat.Name)
+		err = chatsTable.Insert(chat.ID, chat.Name)
 	} else {
 
 		if chat.Name == registeredChat.Name {
 			return nil
 		}
 
-		tmpQuery = queryf(queryUpdateChat, tableNameChats, chat.Name, chat.ID)
+		updateValues := map[string]interface{}{
+			"Name":   chat.Name,
+			"ChatId": chat.ID,
+		}
+
+		err = chatsTable.Update(updateValues, conditions)
 	}
 
-	err = execQueryNoResult(tmpQuery)
 	if err != nil {
 		return err
 	}

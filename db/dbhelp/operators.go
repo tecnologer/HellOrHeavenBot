@@ -23,3 +23,13 @@ const (
 	//Conts is Contains
 	Conts SQLRelOperator = "like '%%%v%%'"
 )
+
+//SQLLogOperator logic operator for SQL Conditions
+type SQLLogOperator string
+
+const (
+	//And operator
+	And SQLLogOperator = "AND"
+	//Or operator
+	Or SQLLogOperator = "OR"
+)
