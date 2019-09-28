@@ -1,6 +1,7 @@
 .vscode/
 hellorheaven.json
-test/
+test/*
+!test/*_test.go
 key.py
 /key.py*
 /key.py
