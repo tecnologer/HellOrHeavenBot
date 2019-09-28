@@ -10,3 +10,4 @@ dist/
 db/dbFiles/
 *.log
 /HellOrHeavenBot
+python3-version/
