@@ -9,7 +9,7 @@ import (
 )
 
 var responsesTable = &hpr.SQLTable{
-	Name: "ChatLog",
+	Name: "Response",
 	Columns: []*hpr.SQLColumn{
 		hpr.NewPKCol("Id"),
 		hpr.NewIntCol("Type"),
