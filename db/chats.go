@@ -5,7 +5,6 @@ import (
 	m "github.com/tecnologer/HellOrHeavenBot/model"
 )
 
-var tableChatsIsCreated bool
 var chatsTable = &hpr.SQLTable{
 	Name: "ChatLog",
 	Columns: []*hpr.SQLColumn{
