@@ -15,18 +15,6 @@ var chatsTable = &hpr.SQLTable{
 	},
 }
 
-const (
-// querySearchChatByName = "SELECT [ChatId], [Name] FROM [%s] WHERE [Name] like '%%%s%%'"
-//querySearchChatByID = "SELECT [ChatId], [Name] FROM [%s] WHERE [ChatId] = %d"
-// queryGetChatByName = "SELECT [ChatId], [Name] FROM [%s] WHERE [Name] = '%s'"
-// queryUpdateChat    = "UPDATE [%s] SET [Name]=%s WHERE [ChatId]=%d;"
-// queryInsertChat    = "INSERT INTO [%s] (ChatId, Name) VALUES (%d, '%s');"
-)
-
-func init() {
-	chatsTable.Create()
-}
-
 //InsertOrUpdateChat Inserts a new chat or update it if is exists
 func InsertOrUpdateChat(chat *m.Chat) error {
 	err := chatsTable.Create()
