@@ -1,12 +1,12 @@
 package model
 
-import "regexp"
+import "encoding/json"
 
 //CustomResponse is a struct to store the rules based on Regex
 type CustomResponse struct {
-	Regex        *regexp.Regexp `json:"regex"`
-	Response     string         `json:"answer"`
-	ResponseType ResponseType   `json:"type"`
-	ChatID       int            `json:"chat_id"`
-	Author       int            `json:"author"`
+	Regex        string       `json:"regex"`
+	Response     string       `json:"answer"`
+	ResponseType ResponseType `json:"type"`
+	ChatID       json.Number  `json:"chat_id,Number"`
+	Author       int          `json:"author"`
 }
