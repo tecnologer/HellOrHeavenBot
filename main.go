@@ -8,7 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tecnologer/HellOrHeavenBot/core"
-	"github.com/tecnologer/HellOrHeavenBot/db"
+	hpr "github.com/tecnologer/HellOrHeavenBot/db/dbhelp"
 	"github.com/tecnologer/HellOrHeavenBot/test"
 )
 
@@ -38,13 +38,13 @@ func init() {
 
 func main() {
 	log.Info("************************** new instance running **************************")
-	err := db.Open()
+	err := hpr.Open()
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer db.Close()
+	defer hpr.Close()
 
 	test.RestoreData()
 
