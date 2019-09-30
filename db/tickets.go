@@ -1,118 +1,134 @@
 package db
 
 import (
-	"github.com/recoilme/pudge"
 	log "github.com/sirupsen/logrus"
+	hpr "github.com/tecnologer/HellOrHeavenBot/db/dbhelp"
+	"github.com/tecnologer/HellOrHeavenBot/model"
 	m "github.com/tecnologer/HellOrHeavenBot/model"
 )
 
-const (
-	tableNameStats        = "Stats"
-	queryCreateTableStats = `CREATE TABLE IF NOT EXISTS [%s] (
-		[Id] integer not null primary key AUTOINCREMENT,
-		[HellCount] integer not null,
-		[HeavenCount] integer not null,
-		[UserName] text not null,
-		[UserId] integer
-	)`
-	queryGetStatsByUsername    = "SELECT [HellCount], [HeavenCount], [UserName] FROM [%s] WHERE [UserName]='%s'"
-	queryUpdateStatsByUsername = "UPDATE [%s] SET [HellCount]=%d, [HeavenCount]=%d WHERE [UserName]='%s';"
-	queryInsertStatsByUsername = "INSERT INTO [%s] (HellCount, HeavenCount, UserName) VALUES (%d, %d, '%s');"
-)
-
-var tableStatsIsCreated = false
-
-func init() {
-	createTableStats()
+var ticketsTable = &hpr.SQLTable{
+	Name: "Stats",
+	Columns: []*hpr.SQLColumn{
+		hpr.NewPKCol("Id"),
+		hpr.NewIntCol("HellCount"),
+		hpr.NewIntCol("HeavenCount"),
+		hpr.NewTextCol("UserName"),
+		hpr.NewIntNilCol("UserId"),
+	},
 }
 
 //InsertStat inserts or update registers for stats
 func InsertStat(doomed string, t m.StatsType) error {
-	// createTableStats()
+	err := ticketsTable.Create()
 
-	// getStatsByUser := queryf(queryGetStatsByUsername, tableNameStats, doomed)
+	if err != nil {
+		return err
+	}
 
-	// rows, err := execQuery(getStatsByUser)
+	conditions := []*hpr.ConditionGroup{
+		&hpr.ConditionGroup{
+			ConLeft: &hpr.Condition{
+				Column: ticketsTable.GetColByName("UserName"),
+				RelOp:  hpr.Eq,
+				Value:  doomed,
+			},
+		},
+	}
 
-	// if err != nil {
-	// 	return err
-	// }
-	// defer rows.Close()
-	// var doomedStats *m.Stats
+	rows, err := ticketsTable.ExecSelectCols([]string{"HellCount", "HeavenCount", "UserName"}, conditions)
 
-	// for rows.Next() {
-	// 	doomedStats = new(m.Stats)
-	// 	err = rows.Scan(&doomedStats.Hell, &doomedStats.Heaven, &doomedStats.UserName)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// }
-	// err = rows.Err()
-	// if err != nil {
-	// 	return err
-	// }
-	// var isInsert = doomedStats == nil
-	// var tmpQuery query
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	var doomedStats *m.Stats
 
-	// if isInsert {
-	// 	hell, heaven := 0, 0
-	// 	if t == m.StatsHeaven {
-	// 		heaven = 1
-	// 	} else {
-	// 		hell = 1
-	// 	}
+	for rows.Next() {
+		doomedStats = new(m.Stats)
+		err = rows.Scan(&doomedStats.Hell, &doomedStats.Heaven, &doomedStats.UserName)
+		if err != nil {
+			return err
+		}
+	}
+	err = rows.Err()
+	if err != nil {
+		return err
+	}
+	var isInsert = doomedStats == nil
 
-	// 	tmpQuery = queryf(queryInsertStatsByUsername, tableNameStats, hell, heaven, doomed)
-	// } else {
-	// 	if t == m.StatsHell {
-	// 		doomedStats.Hell++
-	// 	}
+	if isInsert {
+		hell, heaven := 0, 0
+		if t == m.StatsHeaven {
+			heaven = 1
+		} else {
+			hell = 1
+		}
 
-	// 	if t == m.StatsHeaven {
-	// 		doomedStats.Heaven++
-	// 	}
+		err = ticketsTable.Insert(hell, heaven, doomed, nil)
+	} else {
+		if t == m.StatsHell {
+			doomedStats.Hell++
+		}
 
-	// 	tmpQuery = queryf(queryUpdateStatsByUsername, tableNameStats, doomedStats.Hell, doomedStats.Heaven, doomedStats.UserName)
-	// }
+		if t == m.StatsHeaven {
+			doomedStats.Heaven++
+		}
 
-	// err = execQueryNoResult(tmpQuery)
-	// if err != nil {
-	// 	return err
-	// }
+		valuesToUpdate := map[string]interface{}{
+			"HellCount":   doomedStats.Hell,
+			"HeavenCount": doomedStats.Heaven,
+		}
+
+		err = ticketsTable.Update(valuesToUpdate, conditions)
+	}
+
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
+//GetStats returns the statistic for the user who request it
 func GetStats(doomed string) *m.Stats {
-	db, err := pudge.Open("./db/dbFiles/Stats", nil)
+	err := ticketsTable.Create()
 
 	if err != nil {
-		log.Println(err)
+		log.WithField("GetStatsByName", doomed).WithError(err)
 		return nil
 	}
-	defer db.Close()
 
-	var doomedStats m.Stats
-	err = db.Get(doomed, &doomedStats)
+	conditions := []*hpr.ConditionGroup{
+		&hpr.ConditionGroup{
+			ConLeft: &hpr.Condition{
+				Column: ticketsTable.GetColByName("UserName"),
+				RelOp:  hpr.Eq,
+				Value:  doomed,
+			},
+		},
+	}
+
+	var doomedStats *model.Stats
+	rows, err := ticketsTable.ExecSelectCols([]string{"HellCount", "HeavenCount", "UserName"}, conditions)
+	if err != nil {
+		log.WithField("GetStatsByName", doomed).WithError(err)
+		return nil
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		doomedStats = new(model.Stats)
+		err = rows.Scan(&doomedStats.Hell, &doomedStats.Heaven, &doomedStats.UserName)
+		if err != nil {
+			log.WithField("GetStatsByName", doomed).WithError(err)
+			return nil
+		}
+	}
+	err = rows.Err()
 
 	if err != nil {
-		log.Println(err)
+		log.WithField("GetStatsByName", doomed).WithError(err)
 		return nil
 	}
-	return &doomedStats
-}
-
-func createTableStats() {
-	log.Debugf("creating table %s\n", tableNameStats)
-	if tableStatsIsCreated {
-		return
-	}
-
-	// err := execQueryNoResult(queryf(queryCreateTableStats, tableNameStats))
-	// tableStatsIsCreated = err == nil
-	// if err != nil {
-	// 	log.WithError(err).Errorf("error when try create table %s", tableNameStats)
-	// } else {
-	// 	log.Debugf("table %s is created\n", tableNameStats)
-	// }
-
+	return doomedStats
 }
