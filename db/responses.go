@@ -9,14 +9,13 @@ import (
 )
 
 var responsesTable = &hpr.SQLTable{
-	Name: "Response",
+	Name: "Responses",
 	Columns: []*hpr.SQLColumn{
 		hpr.NewPKCol("Id"),
 		hpr.NewIntCol("Type"),
 		hpr.NewIntCol("CommandID"),
 		hpr.NewTextCol("Response"),
 		hpr.NewTextCol("Language"),
-		hpr.NewIntNilCol("IsAnimated"),
 	},
 }
 
@@ -27,7 +26,7 @@ func InsertResponse(res *model.Response) error {
 		return err
 	}
 
-	err = responsesTable.Insert(res.Type, res.CommandID, res.Content, res.Language, res.IsAnimated)
+	err = responsesTable.Insert(res.Type, res.CommandID, res.Content, res.Language)
 	if err != nil {
 		return err
 	}
@@ -44,20 +43,20 @@ func GetResponseByCommand(comID int, lang string) (*model.Response, error) {
 	conditions := []*hpr.ConditionGroup{
 		&hpr.ConditionGroup{
 			ConLeft: &hpr.Condition{
-				Column: chatsTable.GetColByName("CommandID"),
+				Column: responsesTable.GetColByName("CommandID"),
 				RelOp:  hpr.Eq,
 				Value:  comID,
 			},
 			LogOp: hpr.And,
 			ConRight: &hpr.Condition{
-				Column: chatsTable.GetColByName("Language"),
+				Column: responsesTable.GetColByName("Language"),
 				RelOp:  hpr.Eq,
 				Value:  lang,
 			},
 		},
 	}
 
-	rows, err := responsesTable.ExecSelectCols([]string{}, conditions)
+	rows, err := responsesTable.ExecSelectCols([]string{"CommandID", "Response", "Type"}, conditions)
 
 	if err != nil {
 		return nil, err
