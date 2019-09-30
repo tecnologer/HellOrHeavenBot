@@ -12,7 +12,7 @@ type Query string
 
 const (
 	queryCreateTablePattern        = "CREATE TABLE IF NOT EXISTS [%s] (%s);"
-	queryCreateTablePKColumPattern = "[%s] %s NOT NULL primary key AUTOINCREMENT"
+	queryCreateTablePKColumPattern = "[%s] %s NOT NULL primary key AUTOINCREMENT,"
 	queryCreateTableColumPattern   = "[%s] %s %s" //[<column-name>] <column-type> [not null]
 	querySelectCols                = "SELECT %s FROM [%s]%s;"
 	queryInsert                    = "INSERT INTO [%s] (%s) VALUES (%s);"

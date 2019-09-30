@@ -24,7 +24,7 @@ func (t *SQLTable) Create() error {
 
 	var columns Query
 
-	for _, col := range t.Columns {
+	for i, col := range t.Columns {
 		if col.IsPK {
 			columns += Queryf(queryCreateTablePKColumPattern, col.Name, col.Type)
 			continue
@@ -36,6 +36,10 @@ func (t *SQLTable) Create() error {
 		}
 
 		columns += Queryf(queryCreateTableColumPattern, col.Name, col.Type, nullableString)
+
+		if (i + 1) < len(t.Columns) {
+			columns += ","
+		}
 	}
 
 	q := Queryf(queryCreateTablePattern, t.Name, columns)
@@ -90,7 +94,7 @@ func (t *SQLTable) Insert(values ...interface{}) error {
 
 	cols := ""
 	vals := ""
-
+	valueIndex := 0
 	for i, col := range t.Columns {
 		if col.IsPK {
 			continue
@@ -98,18 +102,19 @@ func (t *SQLTable) Insert(values ...interface{}) error {
 
 		cols += fmt.Sprintf("[%s]", col.Name)
 
-		if col.Type == SQLTypeText && values[i] != nil {
-			vals += fmt.Sprintf("'%v'", values[i])
-		} else if values[i] == nil {
+		if col.Type == SQLTypeText && values[valueIndex] != nil {
+			vals += fmt.Sprintf("'%v'", values[valueIndex])
+		} else if values[valueIndex] == nil {
 			vals += "NULL"
 		} else {
-			vals += fmt.Sprintf("%v", values[i])
+			vals += fmt.Sprintf("%v", values[valueIndex])
 		}
 
 		if (i + 1) < len(t.Columns) {
 			cols += ","
 			vals += ","
 		}
+		valueIndex++
 	}
 	query := GetQueryInsert(t.Name, cols, vals)
 
@@ -119,14 +124,20 @@ func (t *SQLTable) Insert(values ...interface{}) error {
 //Update updates the specified columns
 func (t *SQLTable) Update(updateValues map[string]interface{}, conditions []*ConditionGroup) error {
 
-	qUpdateSec := "SET "
+	qUpdateSec := ""
+	i := 0
 	for colName, value := range updateValues {
 		column := t.GetColByName(colName)
 
 		if column.Type == SQLTypeText {
-			qUpdateSec += fmt.Sprintf("[%s] = '%v,'", colName, value)
+			qUpdateSec += fmt.Sprintf("[%s] = '%v'", colName, value)
 		} else {
-			qUpdateSec += fmt.Sprintf("[%s] = %v,", colName, value)
+			qUpdateSec += fmt.Sprintf("[%s] = %v", colName, value)
+		}
+
+		i++
+		if i < len(updateValues) {
+			qUpdateSec += ","
 		}
 	}
 
