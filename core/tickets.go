@@ -61,8 +61,12 @@ func updateStats(msg *bot.Message, t m.StatsType) {
 	res, err := db.GetResponseByCommand(cmdID, msg.From.LanguageCode)
 	if err != nil {
 		log.Println(err)
-		sendText(msg, cLang["genericResponse"])
+		sendText(msg, cLang["responseStored"])
 		return
+	}
+
+	if res.Content == "" {
+		res.Content = cLang["responseStored"]
 	}
 
 	SendResponse(msg, res)
