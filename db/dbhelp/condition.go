@@ -19,6 +19,14 @@ type Condition struct {
 //ToString parse to SQL transact the condition
 func (c *Condition) ToString() string {
 	pattern := "[%s] %s %v"
+	if c.Value == nil && c.RelOp == Eq {
+		return fmt.Sprintf("[%s] IS NULL", c.Column.Name)
+	}
+
+	if c.Value == nil && c.RelOp == NEq {
+		return fmt.Sprintf("[%s] IS NOT NULL", c.Column.Name)
+	}
+
 	if c.Column.Type == SQLTypeText {
 		pattern = "[%s] %s '%v'"
 	}
