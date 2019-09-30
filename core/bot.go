@@ -59,9 +59,15 @@ func messagesHandle(msg *bot.Message) {
 	if cmd != "" {
 		AcceptedCommands.Call(cmd, msg)
 		return
-	} else if HasUserIncompleteRes(msg.From) {
-		setContentToIncomplete(msg.From, msg)
 	}
+
+	if HasUserIncompleteRes(msg.From) {
+		setContentToIncomplete(msg.From, msg)
+		return
+	}
+
+	hasCustomResponse(msg)
+
 }
 
 func callBackHandler(cq *bot.CallbackQuery) {
