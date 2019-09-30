@@ -25,8 +25,8 @@ func init() {
 }
 
 const (
-	queryGetCResponseCommand = "SELECT [CommandID], [Response],[Type], [IsAnimated] FROM [%s] WHERE [CommandID] = %d AND [Language] = '%s';"
-	queryCInsertResponse     = "INSERT INTO [%s] (Type, CommandID, Response, Language, IsAnimated) VALUES (%d, %d, '%s', '%s', %t);"
+	queryGetCResponseCommand = "SELECT [CommandID], [Response],[Type] FROM [%s] WHERE [CommandID] = %d AND [Language] = '%s';"
+	queryCInsertResponse     = "INSERT INTO [%s] (Type, CommandID, Response, Language) VALUES (%d, %d, '%s', '%s', %t);"
 )
 
 //RetrieveCustomResponses returns an array with the CustomReponse for the selected chat
