@@ -5,7 +5,7 @@ type SQLRelOperator string
 
 const (
 	//Eq is Equals
-	Eq SQLRelOperator = "=="
+	Eq SQLRelOperator = "="
 	//NEq is not Equals
 	NEq SQLRelOperator = "<>"
 	//Gt is Greather than
