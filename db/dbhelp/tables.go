@@ -35,7 +35,11 @@ func (t *SQLTable) Create() error {
 			nullableString = "NOT NULL"
 		}
 
-		columns += Queryf(queryCreateTableColumPattern, col.Name, col.Type, nullableString)
+		if col.Type != SQLTypeText {
+			columns += Queryf(queryCreateTableColumPattern, col.Name, col.Type, nullableString)
+		} else {
+			columns += Queryf(queryCreateTableColumPatternInsensitive, col.Name, col.Type, nullableString)
+		}
 
 		if (i + 1) < len(t.Columns) {
 			columns += ","

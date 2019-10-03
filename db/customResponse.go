@@ -76,8 +76,9 @@ func InsertCustomResponse(cRes *model.CustomResponse) error {
 
 	var chatID interface{}
 
-	if cRes.ChatID != "" {
+	if cRes.ChatID != "" && cRes.ChatID != "0" {
 		chatID = cRes.ChatID
 	}
+
 	return customResTable.Insert(cRes.Regex, cRes.Response, cRes.ResponseType, chatID, cRes.Author)
 }

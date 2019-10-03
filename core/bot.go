@@ -66,6 +66,11 @@ func messagesHandle(msg *bot.Message) {
 		return
 	}
 
+	if HasUserIncompleteCustomResponse(msg.From) {
+		setContentToIncompleteCustomResponse(msg.From, msg)
+		return
+	}
+
 	hasCustomResponse(msg)
 
 }

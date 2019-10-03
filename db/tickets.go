@@ -58,14 +58,13 @@ func InsertStat(doomed string, t m.StatsType) error {
 	var isInsert = doomedStats == nil
 
 	if isInsert {
-		hell, heaven := 0, 0
 		if t == m.StatsHeaven {
-			heaven = 1
+			doomedStats.Heaven = 1
 		} else {
-			hell = 1
+			doomedStats.Hell = 1
 		}
 
-		err = ticketsTable.Insert(hell, heaven, doomed, nil)
+		err = InsertStatsObject(doomedStats)
 	} else {
 		if t == m.StatsHell {
 			doomedStats.Hell++
@@ -87,6 +86,23 @@ func InsertStat(doomed string, t m.StatsType) error {
 		return err
 	}
 	return nil
+}
+
+//InsertStatsObject inserts the stats from object to the database
+func InsertStatsObject(stats *m.Stats) error {
+	err := ticketsTable.Create()
+
+	if err != nil {
+		log.WithField("Stats", stats).WithError(err).Debug("error when try insert stats object")
+		return nil
+	}
+
+	var userID interface{}
+	if stats.UserID != 0 {
+		userID = stats.UserID
+	}
+
+	return ticketsTable.Insert(stats.Hell, stats.Heaven, stats.UserName, userID)
 }
 
 //GetStats returns the statistic for the user who request it

@@ -89,6 +89,14 @@ func init() {
 			Action:          GetAlias,
 			AcceptsResponse: false,
 		},
+		&model.Command{
+			ID:              5,
+			Aliases:         []string{"customanswer", "respuestacustom"},
+			Description:     "Agrega una nueva respuesta cuando la expresion regular se cumpla",
+			Timeout:         model.DefaultTimeout,
+			Action:          NewCustomResponse,
+			AcceptsResponse: false,
+		},
 	}
 }
 

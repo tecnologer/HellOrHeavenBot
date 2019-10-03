@@ -11,12 +11,13 @@ import (
 type Query string
 
 const (
-	queryCreateTablePattern        = "CREATE TABLE IF NOT EXISTS [%s] (%s);"
-	queryCreateTablePKColumPattern = "[%s] %s NOT NULL primary key AUTOINCREMENT,"
-	queryCreateTableColumPattern   = "[%s] %s %s" //[<column-name>] <column-type> [not null]
-	querySelectCols                = "SELECT %s FROM [%s]%s;"
-	queryInsert                    = "INSERT INTO [%s] (%s) VALUES (%s);"
-	queryUpdate                    = "UPDATE [%s] SET %s%s;"
+	queryCreateTablePattern                 = "CREATE TABLE IF NOT EXISTS [%s] (%s);"
+	queryCreateTablePKColumPattern          = "[%s] %s NOT NULL primary key AUTOINCREMENT,"
+	queryCreateTableColumPattern            = "[%s] %s %s"                 //[<column-name>] <column-type> [not null]
+	queryCreateTableColumPatternInsensitive = "[%s] %s %s COLLATE NOCASE " //[<column-name>] <column-type> [not null] COLLATE NOCASE
+	querySelectCols                         = "SELECT %s FROM [%s]%s;"
+	queryInsert                             = "INSERT INTO [%s] (%s) VALUES (%s);"
+	queryUpdate                             = "UPDATE [%s] SET %s%s;"
 )
 
 //ExecQuery executes a query that returns rows, typically a SELECT.

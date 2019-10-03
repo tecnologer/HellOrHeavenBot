@@ -82,3 +82,8 @@ func getDoomedName(text string) (name string) {
 
 	return
 }
+
+//InsertStats insert to data base the information from an object *model.Stats
+func InsertStats(stats *m.Stats) error {
+	return db.InsertStatsObject(stats)
+}
