@@ -12,6 +12,7 @@ import re
 import dao
 import customanswer as ca
 from pprint import pprint
+from telepot.loop import MessageLoop
 
 dirname = os.path.dirname(__file__)
 
@@ -22,7 +23,7 @@ bot = telepot.Bot(key.BOT_KEY)  # token
 timeout = {}
 answerTransactions = {}
 
-botId = 684372282
+botId = 945421528
 
 # emojis
 emLike = u'\U0001f44d'
@@ -510,9 +511,10 @@ def on_chat_message(msg):
             newRecord(userSender)
 
 
-bot.message_loop({'chat': on_chat_message})
-
+MessageLoop(bot, on_chat_message).run_as_thread()
 print('Listening ...')
+# bot.message_loop({'chat': on_chat_message})
+
 
 while 1:
     time.sleep(10000)
