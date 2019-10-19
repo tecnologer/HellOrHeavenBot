@@ -181,7 +181,7 @@ def showHelp(user, userSender, chat_id, msg):
         "needWait":  COMMANDS["/help"][WAIT]
     }
     res = "Bot para telegram que registra las acciones buenas y malas de los usuarios.\n\n"
-    for k, v in COMMANDS.iteritems():
+    for k, v in COMMANDS.items():
         res += "- {} {}{}=> {}\n".format(k, v[PARAMS],
                                          "" if v[PARAMS] == "" else " ", v[DESC])
 
